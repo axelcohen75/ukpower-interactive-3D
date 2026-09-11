@@ -5,7 +5,8 @@ export type FuelType =
   | "hydro"
   | "ccgt"
   | "peaker"
-  | "battery";
+  | "battery"
+  | "interconnector";
 
 export interface GeneratorDef {
   id: string;
@@ -21,6 +22,8 @@ export interface GeneratorDef {
   rampRateMWps: number;
   /** Position in the 3D scene, in scene units */
   position: [number, number, number];
+  /** Interconnectors only: the country at the other end, for the flag/label. */
+  country?: string;
 }
 
 export interface GeneratorState {

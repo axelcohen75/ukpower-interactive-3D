@@ -15,6 +15,8 @@ export const FUEL_BLURB: Record<FuelType, string> = {
     "Fast-starting but expensive open-cycle gas turbines, only called on right at the top of demand. Its high cost is usually what sets the clearing price at peak.",
   battery:
     "No fuel cost and near-instant response — the grid's fast defibrillator during a frequency dip. Energy-limited, so it's used for balancing seconds-to-minutes, not for sustained baseload.",
+  interconnector:
+    "A subsea HVDC cable to another country's grid — physically a rectifier, a DC cable, and an inverter at the far end. Competes in the merit order at whatever price that power costs to import. Like wind and solar, it connects through power electronics, not a spinning shaft, so it adds no natural inertia — a growing share of GB's supply now comes with none.",
 };
 
 export const FUEL_INERTIA_NOTE: Record<FuelType, string> = {
@@ -25,4 +27,5 @@ export const FUEL_INERTIA_NOTE: Record<FuelType, string> = {
   ccgt: "Yes — spinning turbine",
   peaker: "Yes — spinning turbine (smaller)",
   battery: "No — connects via inverter",
+  interconnector: "No — HVDC power-electronic link",
 };

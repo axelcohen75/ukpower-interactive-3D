@@ -4,6 +4,14 @@ import type { GeneratorDef } from "./types";
  * A stylised, representative GB generation fleet — not a literal list of
  * real power stations, but scaled so the merit order, totals and clearing
  * price behave the way the real GB system does.
+ *
+ * Includes two HVDC interconnectors (France, Norway) as import-only supply
+ * sources — real GB interconnectors can flow either direction, but this sim
+ * only models importing, which is enough to teach the two things that
+ * matter: they compete in the merit order like any other source, and,
+ * being power-electronic links rather than spinning machines, they
+ * contribute zero natural inertia — same category as wind, solar and
+ * batteries.
  */
 export const GENERATORS: GeneratorDef[] = [
   {
@@ -85,6 +93,28 @@ export const GENERATORS: GeneratorDef[] = [
     inertiaFactor: 0,
     rampRateMWps: 2000,
     position: [-19, 0, 3],
+  },
+  {
+    id: "interconnector-fr",
+    name: "Interconnector — France",
+    type: "interconnector",
+    capacityMW: 2000,
+    srmc: 42,
+    inertiaFactor: 0,
+    rampRateMWps: 800,
+    position: [-13, 0, -6],
+    country: "France",
+  },
+  {
+    id: "interconnector-no",
+    name: "Interconnector — Norway",
+    type: "interconnector",
+    capacityMW: 1400,
+    srmc: 36,
+    inertiaFactor: 0,
+    rampRateMWps: 800,
+    position: [-13, 0, 6],
+    country: "Norway",
   },
 ];
 

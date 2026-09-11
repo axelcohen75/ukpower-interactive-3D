@@ -59,6 +59,7 @@ export const FUEL_LABEL: Record<FuelType, string> = {
   ccgt: "Gas (CCGT)",
   peaker: "Gas peaker (OCGT)",
   battery: "Battery",
+  interconnector: "Interconnector",
 };
 
 export const FUEL_COLOR: Record<FuelType, string> = {
@@ -69,4 +70,5 @@ export const FUEL_COLOR: Record<FuelType, string> = {
   ccgt: "#a0aec0",
   peaker: "#fc8181",
   battery: "#9f7aea",
+  interconnector: "#818cf8",
 };

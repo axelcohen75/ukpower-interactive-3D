@@ -36,7 +36,7 @@ export function MeritOrderPanel() {
                 key={g.id}
                 className={isMarginal ? "merit-seg merit-seg-marginal" : "merit-seg"}
                 style={{ width: `${widthPct}%` }}
-                title={`${FUEL_LABEL[g.type]} · £${g.srmc}/MWh · ${g.capacityMW.toLocaleString()} MW capacity`}
+                title={`${g.name} · £${g.srmc}/MWh · ${g.capacityMW.toLocaleString()} MW capacity`}
               >
                 <div
                   className="merit-seg-fill"
@@ -79,7 +79,7 @@ export function MeritOrderPanel() {
             <tr key={g.id} className={marginalId === g.id ? "marginal-row" : ""}>
               <td>
                 <span className="dot" style={{ background: FUEL_COLOR[g.type] }} />
-                {FUEL_LABEL[g.type]}
+                {g.name}
               </td>
               <td>£{g.srmc}/MWh</td>
               <td>

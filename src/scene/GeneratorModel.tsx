@@ -92,6 +92,36 @@ function GasVisual({ color, stacks = 1 }: { color: string; stacks?: number }) {
   );
 }
 
+const COUNTRY_FLAG: Record<string, string> = {
+  France: "🇫🇷",
+  Norway: "🇳🇴",
+};
+
+function InterconnectorVisual({ color }: { color: string }) {
+  return (
+    <group>
+      {/* converter station */}
+      <mesh position={[0, 0.9, 0]}>
+        <boxGeometry args={[1.6, 1.8, 1.4]} />
+        <meshStandardMaterial color="#334155" metalness={0.4} roughness={0.5} />
+      </mesh>
+      <mesh position={[-0.4, 2, 0]}>
+        <sphereGeometry args={[0.22, 10, 10]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
+      </mesh>
+      <mesh position={[0.4, 2, 0]}>
+        <sphereGeometry args={[0.22, 10, 10]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
+      </mesh>
+      {/* subsea cable stub diving away, toward the coast */}
+      <mesh position={[0, 0.25, 1.3]} rotation={[0.9, 0, 0]}>
+        <cylinderGeometry args={[0.09, 0.09, 1.6, 8]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
 function BatteryVisual({ color }: { color: string }) {
   return (
     <group>
@@ -153,6 +183,7 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
       {def.type === "ccgt" && <GasVisual color={color} stacks={2} />}
       {def.type === "peaker" && <GasVisual color={color} stacks={1} />}
       {def.type === "battery" && <BatteryVisual color={color} />}
+      {def.type === "interconnector" && <InterconnectorVisual color={color} />}
 
       {/* load bar */}
       <mesh position={[0, -0.15, 1.3]}>
@@ -183,7 +214,9 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
             pointerEvents: "none",
           }}
         >
-          <div style={{ fontWeight: 600 }}>{FUEL_LABEL[def.type]}</div>
+          <div style={{ fontWeight: 600 }}>
+            {def.country ? `${COUNTRY_FLAG[def.country] ?? ""} ${FUEL_LABEL[def.type]} — ${def.country}` : FUEL_LABEL[def.type]}
+          </div>
           <div style={{ opacity: 0.85 }}>
             {tripped ? "TRIPPED — offline" : `${Math.round(actualMW).toLocaleString()} MW / ${def.capacityMW.toLocaleString()} MW`}
           </div>
