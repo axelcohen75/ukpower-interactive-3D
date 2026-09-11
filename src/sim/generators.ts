@@ -68,7 +68,10 @@ export const GENERATORS: GeneratorDef[] = [
     capacityMW: 10000,
     srmc: 58,
     inertiaFactor: 0.7,
-    rampRateMWps: 120,
+    // This is an aggregate fleet (many ~500MW units), not one turbine — a
+    // single unit ramps at maybe 5-10%/min, but the fleet can bring
+    // several on in parallel, giving a faster combined rate.
+    rampRateMWps: 450,
     position: [-34, 0, 3],
   },
   {
@@ -78,7 +81,7 @@ export const GENERATORS: GeneratorDef[] = [
     capacityMW: 8000,
     srmc: 78,
     inertiaFactor: 0.7,
-    rampRateMWps: 100,
+    rampRateMWps: 350,
     position: [-29, 0, 3],
   },
   {

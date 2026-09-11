@@ -4,7 +4,28 @@ const W = 400;
 const H = 60;
 const PAD = 4;
 
-export function PriceHistoryPanel() {
+/** A static snapshot for manual mode — dragging the slider produces
+ *  disconnected demand values with no real elapsed time between them, so a
+ *  trend line here would visually imply a smooth evolution that never
+ *  actually happened. */
+function StaticPriceReadout() {
+  const clearingPrice = useSimStore((s) => s.clearingPriceGBPPerMWh);
+  const marginalId = useSimStore((s) => s.marginalGeneratorId);
+
+  return (
+    <div className="panel">
+      <div className="panel-title">
+        Clearing price <span className="hint">— at this demand level</span>
+      </div>
+      <div className="price-static-value">£{clearingPrice.toFixed(0)}/MWh</div>
+      <div className="hint" style={{ fontSize: 11 }}>
+        {marginalId ? "Recalculates instantly as you move the slider." : "Collecting data…"}
+      </div>
+    </div>
+  );
+}
+
+function PriceHistoryChart() {
   const priceHistory = useSimStore((s) => s.priceHistory);
   const clearingPrice = useSimStore((s) => s.clearingPriceGBPPerMWh);
 
@@ -12,7 +33,7 @@ export function PriceHistoryPanel() {
     return (
       <div className="panel">
         <div className="panel-title">
-          Clearing price <span className="hint">— last few minutes</span>
+          Clearing price <span className="hint">— this scenario's timeline</span>
         </div>
         <div className="hint">Collecting data…</div>
       </div>
@@ -34,7 +55,7 @@ export function PriceHistoryPanel() {
   return (
     <div className="panel">
       <div className="panel-title">
-        Clearing price <span className="hint">— last {Math.round(priceHistory.length)}s</span>
+        Clearing price <span className="hint">— this scenario's timeline</span>
       </div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
         <path d={areaPath} fill="rgba(56,189,248,0.15)" />
@@ -49,4 +70,9 @@ export function PriceHistoryPanel() {
       </div>
     </div>
   );
+}
+
+export function PriceHistoryPanel() {
+  const demandMode = useSimStore((s) => s.demandMode);
+  return demandMode === "scenario" ? <PriceHistoryChart /> : <StaticPriceReadout />;
 }

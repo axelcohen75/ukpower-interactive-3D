@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useSimStore } from "../sim/store";
+import { SCENARIOS } from "../sim/scenarios";
 
 type ScenarioChoice = "" | "cloud" | "trip-ccgt" | "restart-ccgt" | "demand-drop" | "aug2019";
 
 export function ScenarioPanel() {
   const [choice, setChoice] = useState<ScenarioChoice>("");
+  const demandMode = useSimStore((s) => s.demandMode);
+  const activeScenarioId = useSimStore((s) => s.activeScenarioId);
   const windFactor = useSimStore((s) => s.windFactor);
   const setWindFactor = useSimStore((s) => s.setWindFactor);
   const cloud = useSimStore((s) => s.cloud);
@@ -35,18 +38,24 @@ export function ScenarioPanel() {
         Try it <span className="hint">— cause and effect</span>
       </div>
 
-      <label className="slider-row">
-        <span>Wind {Math.round(windFactor * 100)}%</span>
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={windFactor}
-          onChange={(e) => setWindFactor(Number(e.target.value))}
-          disabled={disabled}
-        />
-      </label>
+      {demandMode === "manual" ? (
+        <label className="slider-row">
+          <span>Wind {Math.round(windFactor * 100)}%</span>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={windFactor}
+            onChange={(e) => setWindFactor(Number(e.target.value))}
+            disabled={disabled}
+          />
+        </label>
+      ) : (
+        <div className="slider-row hint" style={{ fontStyle: "italic" }}>
+          Wind is set by the "{SCENARIOS[activeScenarioId].name}" scenario, not this slider.
+        </div>
+      )}
 
       <select
         className="scenario-select"

@@ -42,7 +42,7 @@ export interface GeneratorState {
   tripped: boolean;
 }
 
-export type DemandMode = "manual" | "dayCycle";
+export type DemandMode = "manual" | "scenario";
 
 export interface ScenarioCloud {
   active: boolean;

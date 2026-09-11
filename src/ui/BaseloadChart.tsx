@@ -44,7 +44,7 @@ export function BaseloadChart() {
   }, [points]);
 
   const baseloadY = y(BASELOAD_MW);
-  const markerX = demandMode === "dayCycle" ? x(hourOfDay) : null;
+  const markerX = demandMode === "scenario" ? x(hourOfDay) : null;
 
   return (
     <div className="panel">

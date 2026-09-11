@@ -17,7 +17,7 @@ export function Sun() {
 
   useFrame(() => {
     const s = useSimStore.getState();
-    const hour = s.demandMode === "dayCycle" ? s.hourOfDay : 13;
+    const hour = s.demandMode === "scenario" ? s.hourOfDay : 13;
     const isDay = hour >= SUNRISE && hour <= SUNSET;
 
     const t = isDay

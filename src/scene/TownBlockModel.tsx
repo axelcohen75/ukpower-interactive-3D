@@ -106,7 +106,7 @@ export function TownBlockModel({ def }: { def: TownBlockDef }) {
   const hourOfDay = useSimStore((s) => s.hourOfDay);
   const demandMode = useSimStore((s) => s.demandMode);
   const dark = isBlockShed(def.id, activeLfddStages);
-  const night = demandMode === "dayCycle" ? daylightFactor(hourOfDay) < 0.15 : false;
+  const night = demandMode === "scenario" ? daylightFactor(hourOfDay) < 0.15 : false;
 
   return (
     <group position={def.position}>

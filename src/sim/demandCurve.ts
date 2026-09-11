@@ -30,19 +30,26 @@ function cosineInterp(a: number, b: number, t: number): number {
   return a * (1 - mu) + b * mu;
 }
 
-/** National demand (MW) at a given hour-of-day (0..24, wraps). */
-export function demandAtHour(hour: number): number {
-  const h = ((hour % 24) + 24) % 24;
-  for (let i = 0; i < KEY_POINTS.length - 1; i++) {
-    const [h0, d0] = KEY_POINTS[i];
-    const [h1, d1] = KEY_POINTS[i + 1];
-    if (h >= h0 && h <= h1) {
-      const t = (h - h0) / (h1 - h0);
-      return cosineInterp(d0, d1, t);
+/** Builds a smooth 24h(hour) -> MW function from a set of key points, using
+ *  the same cosine interpolation as the default GB curve — shared so other
+ *  scenarios (cold snap, heatwave, ...) can define their own demand shape. */
+export function makeDailyCurve(keyPoints: [hour: number, mw: number][]): (hour: number) => number {
+  return (hour: number) => {
+    const h = ((hour % 24) + 24) % 24;
+    for (let i = 0; i < keyPoints.length - 1; i++) {
+      const [h0, d0] = keyPoints[i];
+      const [h1, d1] = keyPoints[i + 1];
+      if (h >= h0 && h <= h1) {
+        const t = (h - h0) / (h1 - h0);
+        return cosineInterp(d0, d1, t);
+      }
     }
-  }
-  return KEY_POINTS[0][1];
+    return keyPoints[0][1];
+  };
 }
+
+/** National demand (MW) at a given hour-of-day (0..24, wraps). */
+export const demandAtHour = makeDailyCurve(KEY_POINTS);
 
 /** Daylight factor 0..1 used to scale solar availability by time of day. */
 export function daylightFactor(hour: number): number {

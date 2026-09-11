@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { GENERATORS, TOTAL_CAPACITY_MW } from "./generators";
 import { dispatch as economicDispatch } from "./dispatch";
-import { demandAtHour, daylightFactor } from "./demandCurve";
+import { daylightFactor } from "./demandCurve";
+import { SCENARIOS, ECLIPSE_START_S, ECLIPSE_TOTALITY_S, ECLIPSE_RECOVER_S, type ScenarioId } from "./scenarios";
 import {
   LFDD_CUMULATIVE_PCT,
   LFDD_SHED_ORDER,
@@ -26,7 +27,12 @@ const INERTIA_K = 1.1;
 // is done by primary response (battery), LFDD shedding, and redispatch, not
 // this term, so it must not be strong enough to mask the failure states.
 const GOVERNOR_DROOP_GAIN = 0.02;
-const SIM_SPEED_DAY_CYCLE = 0.12; // hours of sim-day advanced per real second
+// Hours of sim-day advanced per real second. Kept slow enough that a
+// realistically ramp-rate-limited gas fleet can actually track the evening
+// peak's demand-rise-plus-solar-decline — at the old faster pace, even the
+// "calm day" baseline could momentarily outrun gas ramp rates and dip into
+// LFDD, which defeats the point of having a calm baseline at all.
+const SIM_SPEED_DAY_CYCLE = 0.06;
 const CLOUD_DURATION_S = 14;
 const CLOUD_SOLAR_FACTOR = 0.12;
 // The real 9 Aug 2019 event: Hornsea wind and Little Barford gas dropped
@@ -94,6 +100,8 @@ interface SimState {
   demandMode: DemandMode;
   manualDemandMW: number;
   hourOfDay: number;
+  activeScenarioId: ScenarioId;
+  scenarioStartedS: number;
 
   windFactor: number; // 0..1, user-controlled "how windy is it"
   cloud: { active: boolean; timeRemaining: number };
@@ -126,6 +134,7 @@ interface SimState {
   paused: boolean;
 
   setDemandMode: (mode: DemandMode) => void;
+  setScenario: (id: ScenarioId) => void;
   setManualDemand: (mw: number) => void;
   setHourOfDay: (h: number) => void;
   setWindFactor: (f: number) => void;
@@ -144,6 +153,8 @@ export const useSimStore = create<SimState>((set, get) => ({
   demandMode: "manual",
   manualDemandMW: 34000,
   hourOfDay: 12,
+  activeScenarioId: "calm",
+  scenarioStartedS: 0,
 
   windFactor: 0.5,
   cloud: { active: false, timeRemaining: 0 },
@@ -175,7 +186,17 @@ export const useSimStore = create<SimState>((set, get) => ({
   simClockS: 0,
   paused: false,
 
-  setDemandMode: (mode) => set({ demandMode: mode }),
+  setDemandMode: (mode) =>
+    set({ demandMode: mode, priceHistory: [], priceHistorySampledAtS: 0 }),
+  setScenario: (id) =>
+    set((s) => ({
+      demandMode: "scenario",
+      activeScenarioId: id,
+      hourOfDay: SCENARIOS[id].startHour ?? 0,
+      scenarioStartedS: s.simClockS,
+      priceHistory: [],
+      priceHistorySampledAtS: s.simClockS,
+    })),
   setManualDemand: (mw) => set({ manualDemandMW: mw }),
   setHourOfDay: (h) => set({ hourOfDay: ((h % 24) + 24) % 24 }),
   setWindFactor: (f) => set({ windFactor: Math.min(1, Math.max(0, f)) }),
@@ -232,6 +253,8 @@ export const useSimStore = create<SimState>((set, get) => ({
       demandMode: "manual",
       manualDemandMW: 34000,
       hourOfDay: 12,
+      activeScenarioId: "calm",
+      scenarioStartedS: 0,
       windFactor: 0.5,
       cloud: { active: false, timeRemaining: 0 },
       generators: initialGeneratorStates(),
@@ -349,12 +372,13 @@ export const useSimStore = create<SimState>((set, get) => ({
     // NORMAL OPERATION
     // ============================================================
     let hourOfDay = s.hourOfDay;
-    if (s.demandMode === "dayCycle") {
+    if (s.demandMode === "scenario") {
       hourOfDay = (hourOfDay + dt * SIM_SPEED_DAY_CYCLE) % 24;
     }
+    const scenario = SCENARIOS[s.activeScenarioId];
 
     const demandMW =
-      s.demandMode === "dayCycle" ? demandAtHour(hourOfDay) : s.manualDemandMW;
+      s.demandMode === "scenario" ? scenario.demandAtHour(hourOfDay) : s.manualDemandMW;
 
     const shedPct = s.activeLfddStages > 0 ? LFDD_CUMULATIVE_PCT[s.activeLfddStages - 1] : 0;
     const effectiveDemandMW = demandMW * (1 - shedPct / 100);
@@ -389,17 +413,39 @@ export const useSimStore = create<SimState>((set, get) => ({
     }
 
     // --- availability by weather / time of day / failure modes ---
-    const sunFactor = s.demandMode === "dayCycle" ? daylightFactor(hourOfDay) : 0.85;
-    const solarFactor = (cloud.active ? CLOUD_SOLAR_FACTOR : 1) * sunFactor * (overFreqTrip.active ? 1 - overFreqTrip.factor : 1);
-    const windAvailFactor = (0.15 + s.windFactor * 0.8) * (overFreqTrip.active ? 1 - overFreqTrip.factor : 1);
+    const inScenario = s.demandMode === "scenario";
+    const sunFactor = inScenario ? daylightFactor(hourOfDay) : 0.85;
+
+    // Solar eclipse: a scripted, precisely-timed total dip and recovery,
+    // keyed to scenario-elapsed time rather than hour-of-day — a real
+    // eclipse doesn't track sun position, it's a fixed, brief event.
+    let eclipseFactor = 1;
+    if (inScenario && scenario.id === "eclipse") {
+      const elapsed = simClockS - s.scenarioStartedS;
+      const totalityEnd = ECLIPSE_START_S + ECLIPSE_TOTALITY_S;
+      const recoverEnd = totalityEnd + ECLIPSE_RECOVER_S;
+      if (elapsed >= ECLIPSE_START_S && elapsed < totalityEnd) {
+        eclipseFactor = 0.03;
+      } else if (elapsed >= totalityEnd && elapsed < recoverEnd) {
+        eclipseFactor = 0.03 + 0.97 * ((elapsed - totalityEnd) / ECLIPSE_RECOVER_S);
+      }
+    }
+
+    const solarFactor =
+      (cloud.active ? CLOUD_SOLAR_FACTOR : 1) * sunFactor * eclipseFactor * (overFreqTrip.active ? 1 - overFreqTrip.factor : 1);
+    const windAvailFactor =
+      (inScenario ? scenario.windAvailability(hourOfDay) : 0.15 + s.windFactor * 0.8) *
+      (overFreqTrip.active ? 1 - overFreqTrip.factor : 1);
+    const nuclearAvail = 0.96 * (inScenario ? (scenario.nuclearDerate ?? 1) : 1);
+    const thermalAvail = inScenario ? (scenario.thermalDerate ?? 1) : 1;
     const availability: Record<string, number> = {
-      nuclear: 0.96,
+      nuclear: nuclearAvail,
       wind: windAvailFactor,
       solar: solarFactor,
       hydro: 0.7,
-      "ccgt-a": 1,
-      "ccgt-b": 1,
-      peaker: 1,
+      "ccgt-a": thermalAvail,
+      "ccgt-b": thermalAvail,
+      peaker: thermalAvail,
       battery: 1,
     };
 
@@ -415,15 +461,22 @@ export const useSimStore = create<SimState>((set, get) => ({
 
     // --- ramp actual output toward target per generator ---
     const isFirstTick = s.simClockS === 0;
+    // A scenario switch changes conditions (demand curve, wind pattern)
+    // instantly, but real plant doesn't — without this, picking "Cold snap"
+    // mid-session causes an artificial mode-switch shock (a sudden apparent
+    // supply gap from ramp lag, not from the scenario's own progression)
+    // that can trip LFDD before the scenario has even really started.
+    const justSwitchedScenario = inScenario && s.scenarioStartedS === s.simClockS;
+    const snapToTarget = isFirstTick || justSwitchedScenario;
     const generators: Record<string, GeneratorState> = {};
     let totalSupplyMW = 0;
     for (const g of GENERATORS) {
       const prev = s.generators[g.id];
       const target = s.trippedIds.has(g.id) ? 0 : targets[g.id] ?? 0;
       let actualMW = prev.actualMW;
-      if (isFirstTick) {
+      if (snapToTarget) {
         // Start from steady state, not a cold black-start — the plants are
-        // already running when the page loads.
+        // already running when the page loads / the scenario starts.
         actualMW = target;
       } else {
         actualMW = rampToward(actualMW, target, g.rampRateMWps, dt);
@@ -432,22 +485,37 @@ export const useSimStore = create<SimState>((set, get) => ({
         actualMW = Math.max(0, actualMW - g.rampRateMWps * dt * 4);
 
       totalSupplyMW += actualMW;
+      // Large CCGT plant is realistically kept synchronised to the grid —
+      // spinning, contributing inertia — even at zero dispatched output,
+      // rather than cold-started from scratch; only a fast-start OCGT
+      // peaker is genuinely offline until called on. Without this, the
+      // low-demand overnight/early-morning hours (before any gas is
+      // economically dispatched) have so little online inertia that even
+      // a normal, smooth demand ramp can swing frequency further than a
+      // "calm day" should.
+      const online = actualMW > 1 || (g.type === "ccgt" && !s.trippedIds.has(g.id));
       generators[g.id] = {
         id: g.id,
         targetMW: target,
         actualMW,
         availableMW: g.capacityMW * (availability[g.id] ?? 1),
-        online: actualMW > 1,
+        online,
         tripped: s.trippedIds.has(g.id),
       };
     }
 
     // --- primary frequency response: battery engages automatically on any
-    //     meaningful under-frequency, not just after a specific scenario ---
+    //     meaningful under-frequency, not just after a specific scenario.
+    //     Tuned to respond early, to small deviations — real fast-frequency-
+    //     response services (what these batteries model) act within seconds
+    //     of any deviation, which is exactly what keeps routine ramp-rate
+    //     mismatches (a normal morning demand ramp outrunning gas) from
+    //     ever reaching LFDD territory; only genuinely large shocks should
+    //     exceed the battery's limited capacity and require shedding. ---
     const batteryDef = GEN_BY_ID["battery"];
     const imbalanceBeforeBattery = totalSupplyMW - effectiveDemandMW;
-    const needsPrimaryResponse = s.frequencyHz < 49.85 || imbalanceBeforeBattery < -100;
-    if (needsPrimaryResponse && imbalanceBeforeBattery < -50) {
+    const needsPrimaryResponse = s.frequencyHz < 49.92 || imbalanceBeforeBattery < -50;
+    if (needsPrimaryResponse && imbalanceBeforeBattery < -20) {
       const need = Math.min(batteryDef.capacityMW, -imbalanceBeforeBattery);
       const prev = generators["battery"].actualMW;
       const actualMW = rampToward(prev, need, batteryDef.rampRateMWps, dt);

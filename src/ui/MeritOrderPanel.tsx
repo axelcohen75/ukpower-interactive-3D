@@ -50,7 +50,16 @@ export function MeritOrderPanel() {
             );
           })}
           <div className="demand-marker" style={{ left: `${demandMarkerPct}%` }}>
-            <div className="demand-marker-label">demand{activeLfddStages > 0 ? " (after shedding)" : ""}</div>
+            <div
+              className="demand-marker-label"
+              style={
+                demandMarkerPct > 60
+                  ? { left: "auto", right: 4, textAlign: "right" }
+                  : undefined
+              }
+            >
+              demand{activeLfddStages > 0 ? " (after shedding)" : ""}
+            </div>
           </div>
         </div>
       </div>

@@ -20,6 +20,8 @@
   width: 440px;
   z-index: 5;
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
   padding: 16px 16px 24px;
   display: flex;
   flex-direction: column;
@@ -359,21 +361,25 @@ input[type="range"] {
   accent-color: #38bdf8;
 }
 
-.slider-with-marker {
-  position: relative;
-  padding-top: 12px;
+.scenario-mode-select {
+  flex: 1;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  font-size: 11px;
+  cursor: pointer;
 }
 
-.baseload-tick {
-  position: absolute;
-  top: 0;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 6px solid #fbbf24;
-  pointer-events: none;
+.scenario-mode-select option {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.scenario-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  font-style: italic;
 }
 
 /* --- merit order --- */
@@ -503,6 +509,13 @@ input[type="range"] {
 }
 
 /* --- clearing price history --- */
+.price-static-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 4px 0 2px;
+}
+
 .price-history-readout {
   display: flex;
   align-items: baseline;
