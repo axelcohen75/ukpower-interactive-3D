@@ -20,7 +20,7 @@ export function MeritOrderPanel() {
   return (
     <div className="panel">
       <div className="panel-title">
-        Merit order <span className="hint">— cheapest generator dispatched first</span>
+        Merit order <span className="hint">— NESO calls the cheapest generator first</span>
       </div>
       <div className="merit-bar-wrap">
         <div className="merit-bar">

@@ -37,6 +37,7 @@ export function TrunkNode({ position }: { position: [number, number, number] }) 
         >
           <div style={{ fontWeight: 600 }}>Transmission hub</div>
           <div style={{ opacity: 0.8 }}>every 400kV line meets here</div>
+          <div style={{ opacity: 0.6, fontSize: 10, marginTop: 2 }}>wires owned by National Grid ET</div>
         </div>
       </Html>
     </group>

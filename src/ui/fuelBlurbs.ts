@@ -1,5 +1,17 @@
 import type { FuelType } from "../sim/types";
 
+/** A short, bold, at-a-glance answer to "why does this exist in the market?" */
+export const MARKET_ROLE: Record<FuelType, string> = {
+  nuclear: "Always-on baseload — cheapest to run, first to be dispatched.",
+  wind: "Free to run, but weather decides its output, not the market.",
+  solar: "Free to run, but the sun decides its output, not the market.",
+  hydro: "Cheap and fast-reacting — flexes ahead of gas when needed.",
+  ccgt: "The system's workhorse — flexes to cover what renewables miss.",
+  peaker: "Called on only at peak — usually sets the price everyone pays.",
+  battery: "Not a market bidder — a fast reserve for balancing, not baseload.",
+  interconnector: "Imported power — competes on price like any home generator.",
+};
+
 export const FUEL_BLURB: Record<FuelType, string> = {
   nuclear:
     "Runs flat-out almost all the time. Cheap to run once built, but physically can't ramp up or down quickly — that inflexibility is the trade-off for its rock-bottom cost.",

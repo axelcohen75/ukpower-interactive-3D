@@ -15,24 +15,20 @@ function App() {
     <div className="app-root">
       <Scene />
 
-      <header className="app-header">
-        <div className="app-title">UK Power System</div>
-        <div className="app-subtitle">
-          Generation → Transmission → Distribution → Consumption
-        </div>
-      </header>
-
       <ViewTabs />
 
-      <div className="overlay-right">
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <div className="app-title">UK Power System</div>
+          <div className="app-subtitle">
+            Generation → Transmission → Distribution → Consumption
+          </div>
+        </div>
         <FrequencyGauge />
-      </div>
-
-      <div className="overlay-bottom">
         <DemandPanel />
         <MeritOrderPanel />
         <ScenarioPanel />
-      </div>
+      </aside>
 
       <InspectorPanel />
       <Glossary />

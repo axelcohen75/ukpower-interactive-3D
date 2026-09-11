@@ -6,6 +6,7 @@ import type { GeneratorDef } from "../sim/types";
 import { useSimStore } from "../sim/store";
 import { useUiStore } from "../ui/uiStore";
 import { FUEL_COLOR, FUEL_LABEL } from "../sim/dispatch";
+import { MARKET_ROLE } from "../ui/fuelBlurbs";
 
 function NuclearVisual({ color }: { color: string }) {
   return (
@@ -30,11 +31,20 @@ function WindVisual({ color, spinRef }: { color: string; spinRef: React.RefObjec
         <meshStandardMaterial color="#f7fafc" />
       </mesh>
       <group ref={spinRef} position={[0, 3.6, 0]}>
+        <mesh>
+          <sphereGeometry args={[0.16, 10, 10]} />
+          <meshStandardMaterial color="#e2e8f0" />
+        </mesh>
+        {/* Each blade is a child of its own rotated pivot group, so it
+            extends radially outward from the hub instead of just being
+            rotated in place. */}
         {[0, 120, 240].map((deg) => (
-          <mesh key={deg} rotation={[0, 0, THREE.MathUtils.degToRad(deg)]} position={[0, 0.9, 0]}>
-            <boxGeometry args={[0.15, 1.8, 0.05]} />
-            <meshStandardMaterial color={color} />
-          </mesh>
+          <group key={deg} rotation={[0, 0, THREE.MathUtils.degToRad(deg)]}>
+            <mesh position={[0, 0.95, 0]}>
+              <boxGeometry args={[0.14, 1.7, 0.04]} />
+              <meshStandardMaterial color={color} />
+            </mesh>
+          </group>
         ))}
       </group>
     </group>
@@ -235,7 +245,12 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
             )}
             {def.country ? `${FUEL_LABEL[def.type]} — ${def.country}` : FUEL_LABEL[def.type]}
           </div>
-          <div style={{ opacity: 0.85 }}>
+          {hover && (
+            <div style={{ fontWeight: 700, color: color, maxWidth: 190, whiteSpace: "normal", marginTop: 2 }}>
+              {MARKET_ROLE[def.type]}
+            </div>
+          )}
+          <div style={{ opacity: 0.85, marginTop: hover ? 3 : 0 }}>
             {tripped ? "TRIPPED — offline" : `${Math.round(actualMW).toLocaleString()} MW / ${def.capacityMW.toLocaleString()} MW`}
           </div>
         </div>

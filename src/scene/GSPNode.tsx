@@ -64,7 +64,12 @@ export function GSPNode({ def }: { def: GSPDef }) {
             pointerEvents: "none",
           }}
         >
-          <div style={{ fontWeight: 600 }}>{def.name}</div>
+          <div style={{ fontWeight: 600 }}>{def.name} — substation</div>
+          {hover && (
+            <div style={{ fontWeight: 700, color: "#f6ad55", maxWidth: 190, whiteSpace: "normal", margin: "2px 0" }}>
+              Physical link, not a market player — just moves whatever power is needed.
+            </div>
+          )}
           <div style={{ opacity: 0.85 }}>
             <span style={{ color: "#f6ad55" }}>400 kV</span> →{" "}
             <span style={{ color: dark ? "#ef4444" : "#68d391" }}>33 kV</span>
