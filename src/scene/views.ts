@@ -31,8 +31,8 @@ export const VIEWS: Record<ViewId, ViewDef> = {
   transmission: {
     label: "2. Transport",
     shortLabel: "Transport",
-    position: [-14, 13, 15],
-    target: [-14, 4, 0],
+    position: [-13, 15, 18],
+    target: [-10, 4, 0],
     color: "#f6ad55",
   },
   distribution: {

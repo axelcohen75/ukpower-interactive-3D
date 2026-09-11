@@ -5,7 +5,7 @@ import * as THREE from "three";
 import type { GeneratorDef } from "../sim/types";
 import { useSimStore } from "../sim/store";
 import { useUiStore } from "../ui/uiStore";
-import { FUEL_COLOR, FUEL_LABEL } from "../sim/dispatch";
+import { FUEL_COLOR } from "../sim/dispatch";
 import { MARKET_ROLE } from "../ui/fuelBlurbs";
 
 function NuclearVisual({ color }: { color: string }) {
@@ -107,30 +107,49 @@ function GasVisual({ color, stacks = 1 }: { color: string; stacks?: number }) {
 // instead — guaranteed to render the same everywhere.
 const COUNTRY_CHIP: Record<string, { code: string; color: string }> = {
   France: { code: "FR", color: "#0055a4" },
-  Norway: { code: "NO", color: "#ba0c2f" },
+  Norway: { code: "NO", color: "#00205b" },
+  Denmark: { code: "DK", color: "#c8102e" },
+  Netherlands: { code: "NL", color: "#21468b" },
+  Belgium: { code: "BE", color: "#fdda24" },
+  Ireland: { code: "IE", color: "#169b62" },
 };
 
-function InterconnectorVisual({ color }: { color: string }) {
+/** One converter station — a real GB interconnector's onshore end always
+ *  has one of these, converting AC<->DC. Each aggregated node renders one
+ *  per real link it stands in for, so the count itself teaches "this is
+ *  several cables bundled together". */
+function ConverterStation({ color, offsetX }: { color: string; offsetX: number }) {
   return (
-    <group>
-      {/* converter station */}
-      <mesh position={[0, 0.9, 0]}>
-        <boxGeometry args={[1.6, 1.8, 1.4]} />
+    <group position={[offsetX, 0, 0]}>
+      <mesh position={[0, 0.7, 0]}>
+        <boxGeometry args={[1.1, 1.4, 1.1]} />
         <meshStandardMaterial color="#334155" metalness={0.4} roughness={0.5} />
       </mesh>
-      <mesh position={[-0.4, 2, 0]}>
-        <sphereGeometry args={[0.22, 10, 10]} />
+      <mesh position={[-0.28, 1.5, 0]}>
+        <sphereGeometry args={[0.16, 10, 10]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
       </mesh>
-      <mesh position={[0.4, 2, 0]}>
-        <sphereGeometry args={[0.22, 10, 10]} />
+      <mesh position={[0.28, 1.5, 0]}>
+        <sphereGeometry args={[0.16, 10, 10]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
       </mesh>
       {/* subsea cable stub diving away, toward the coast */}
-      <mesh position={[0, 0.25, 1.3]} rotation={[0.9, 0, 0]}>
-        <cylinderGeometry args={[0.09, 0.09, 1.6, 8]} />
+      <mesh position={[0, 0.2, 0.9]} rotation={[0.9, 0, 0]}>
+        <cylinderGeometry args={[0.06, 0.06, 1.1, 8]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
       </mesh>
+    </group>
+  );
+}
+
+function InterconnectorVisual({ color, linkCount }: { color: string; linkCount: number }) {
+  const spacing = 1.5;
+  const start = -((linkCount - 1) * spacing) / 2;
+  return (
+    <group>
+      {Array.from({ length: linkCount }).map((_, i) => (
+        <ConverterStation key={i} color={color} offsetX={start + i * spacing} />
+      ))}
     </group>
   );
 }
@@ -157,6 +176,12 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
     (s) => s.selected?.type === "generator" && s.selected.id === def.id,
   );
   const setSelected = useUiStore((s) => s.setSelected);
+  const activeView = useUiStore((s) => s.activeView);
+  // Persist the label only in the view where this installation is the
+  // focus — otherwise its label can float over the sidebar or other
+  // tiers' content when it's just in the background of an unrelated view.
+  const relevantView = def.type === "interconnector" ? "transmission" : "generation";
+  const showLabel = hover || activeView === relevantView;
 
   useFrame((_, delta) => {
     if (spinRef.current) {
@@ -196,7 +221,9 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
       {def.type === "ccgt" && <GasVisual color={color} stacks={2} />}
       {def.type === "peaker" && <GasVisual color={color} stacks={1} />}
       {def.type === "battery" && <BatteryVisual color={color} />}
-      {def.type === "interconnector" && <InterconnectorVisual color={color} />}
+      {def.type === "interconnector" && (
+        <InterconnectorVisual color={color} linkCount={def.countries?.length ?? 1} />
+      )}
 
       {/* load bar */}
       <mesh position={[0, -0.15, 1.3]}>
@@ -213,48 +240,58 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
         />
       </mesh>
 
-      <Html position={[0, 4.4, 0]} center occlude style={{ pointerEvents: "none" }}>
-        <div
-          style={{
-            background: hover ? "rgba(17,24,39,0.95)" : "rgba(17,24,39,0.75)",
-            color: "white",
-            padding: "4px 8px",
-            borderRadius: 6,
-            fontSize: 12,
-            fontFamily: "system-ui, sans-serif",
-            whiteSpace: "nowrap",
-            border: tripped ? "1px solid #e53e3e" : "1px solid rgba(255,255,255,0.15)",
-            pointerEvents: "none",
-          }}
-        >
-          <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: 5 }}>
-            {def.country && COUNTRY_CHIP[def.country] && (
-              <span
-                style={{
-                  background: COUNTRY_CHIP[def.country].color,
-                  color: "white",
-                  fontSize: 9,
-                  fontWeight: 800,
-                  padding: "1px 4px",
-                  borderRadius: 3,
-                  letterSpacing: "0.02em",
-                }}
-              >
-                {COUNTRY_CHIP[def.country].code}
-              </span>
-            )}
-            {def.country ? `${FUEL_LABEL[def.type]} — ${def.country}` : FUEL_LABEL[def.type]}
-          </div>
-          {hover && (
-            <div style={{ fontWeight: 700, color: color, maxWidth: 190, whiteSpace: "normal", marginTop: 2 }}>
-              {MARKET_ROLE[def.type]}
+      {showLabel && (
+        <Html position={[0, 4.4, 0]} center occlude style={{ pointerEvents: "none" }}>
+          <div
+            style={{
+              background: hover ? "rgba(17,24,39,0.95)" : "rgba(17,24,39,0.75)",
+              color: "white",
+              padding: "4px 8px",
+              borderRadius: 6,
+              fontSize: 12,
+              fontFamily: "system-ui, sans-serif",
+              whiteSpace: "nowrap",
+              border: tripped ? "1px solid #e53e3e" : "1px solid rgba(255,255,255,0.15)",
+              pointerEvents: "none",
+            }}
+          >
+            <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+              {def.countries?.map((c) =>
+                COUNTRY_CHIP[c] ? (
+                  <span
+                    key={c}
+                    style={{
+                      background: COUNTRY_CHIP[c].color,
+                      color: c === "Belgium" ? "#1a202c" : "white",
+                      fontSize: 9,
+                      fontWeight: 800,
+                      padding: "1px 4px",
+                      borderRadius: 3,
+                      letterSpacing: "0.02em",
+                    }}
+                  >
+                    {COUNTRY_CHIP[c].code}
+                  </span>
+                ) : null,
+              )}
+              {def.name}
             </div>
-          )}
-          <div style={{ opacity: 0.85, marginTop: hover ? 3 : 0 }}>
-            {tripped ? "TRIPPED — offline" : `${Math.round(actualMW).toLocaleString()} MW / ${def.capacityMW.toLocaleString()} MW`}
+            {hover && (
+              <div style={{ fontWeight: 700, color: color, maxWidth: 210, whiteSpace: "normal", marginTop: 2 }}>
+                {MARKET_ROLE[def.type]}
+              </div>
+            )}
+            {hover && def.realLinks && (
+              <div style={{ opacity: 0.7, maxWidth: 210, whiteSpace: "normal", marginTop: 2, fontSize: 10.5 }}>
+                {def.realLinks}
+              </div>
+            )}
+            <div style={{ opacity: 0.85, marginTop: hover ? 3 : 0 }}>
+              {tripped ? "TRIPPED — offline" : `${Math.round(actualMW).toLocaleString()} MW / ${def.capacityMW.toLocaleString()} MW`}
+            </div>
           </div>
-        </div>
-      </Html>
+        </Html>
+      )}
     </group>
   );
 }

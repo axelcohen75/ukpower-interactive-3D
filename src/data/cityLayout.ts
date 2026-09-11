@@ -31,7 +31,7 @@ export interface TownBlockDef {
 /** The transmission backbone junction where every generator's line converges
  * before splitting out (still thick, still 400kV) toward each GSP — the
  * "neck" of the funnel. */
-export const TRUNK_POSITION: [number, number, number] = [-11, 2.5, 0];
+export const TRUNK_POSITION: [number, number, number] = [-4, 2.5, 0];
 
 // Kept shallow in Z (unlike a literal map) so each focused camera view can
 // frame a whole tier without part of it projecting behind the 2D UI panels.

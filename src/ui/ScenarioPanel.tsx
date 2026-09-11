@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { useSimStore } from "../sim/store";
 
+type ScenarioChoice = "" | "cloud" | "trip-ccgt" | "restart-ccgt" | "demand-drop" | "aug2019";
+
 export function ScenarioPanel() {
+  const [choice, setChoice] = useState<ScenarioChoice>("");
   const windFactor = useSimStore((s) => s.windFactor);
   const setWindFactor = useSimStore((s) => s.setWindFactor);
   const cloud = useSimStore((s) => s.cloud);
@@ -15,6 +19,15 @@ export function ScenarioPanel() {
 
   const ccgtTripped = generators["ccgt-a"]?.tripped;
   const disabled = systemState !== "normal";
+
+  function handleChoice(value: ScenarioChoice) {
+    setChoice("");
+    if (value === "cloud") triggerCloud();
+    else if (value === "trip-ccgt") tripGenerator("ccgt-a");
+    else if (value === "restart-ccgt") restartGenerator("ccgt-a");
+    else if (value === "demand-drop") triggerDemandDrop();
+    else if (value === "aug2019") triggerAug2019();
+  }
 
   return (
     <div className="panel">
@@ -35,27 +48,26 @@ export function ScenarioPanel() {
         />
       </label>
 
-      <button className="scenario-btn" onClick={triggerCloud} disabled={disabled || cloud.active}>
-        {cloud.active ? `☁️ Cloud passing… (${cloud.timeRemaining.toFixed(0)}s)` : "☁️ Send a cloud over the solar farm"}
-      </button>
-
-      {!ccgtTripped ? (
-        <button className="scenario-btn scenario-btn-danger" onClick={() => tripGenerator("ccgt-a")} disabled={disabled}>
-          ⚡ Trip the efficient gas CCGT unit
-        </button>
-      ) : (
-        <button className="scenario-btn" onClick={() => restartGenerator("ccgt-a")} disabled={disabled}>
-          🔧 Restart the gas CCGT unit
-        </button>
-      )}
-
-      <button className="scenario-btn scenario-btn-danger" onClick={triggerDemandDrop} disabled={disabled}>
-        📉 Trip a major industrial load (overfrequency test)
-      </button>
-
-      <button className="scenario-btn scenario-btn-danger" onClick={triggerAug2019} disabled={disabled}>
-        🇬🇧 Replay 9 Aug 2019 blackout
-      </button>
+      <select
+        className="scenario-select"
+        value={choice}
+        disabled={disabled}
+        onChange={(e) => handleChoice(e.target.value as ScenarioChoice)}
+      >
+        <option value="" disabled>
+          Trigger a scenario…
+        </option>
+        <option value="cloud" disabled={cloud.active}>
+          ☁️ {cloud.active ? `Cloud passing… (${cloud.timeRemaining.toFixed(0)}s)` : "Send a cloud over the solar farm"}
+        </option>
+        {!ccgtTripped ? (
+          <option value="trip-ccgt">⚡ Trip the efficient gas CCGT unit</option>
+        ) : (
+          <option value="restart-ccgt">🔧 Restart the gas CCGT unit</option>
+        )}
+        <option value="demand-drop">📉 Trip a major industrial load (overfrequency test)</option>
+        <option value="aug2019">🇬🇧 Replay 9 Aug 2019 blackout</option>
+      </select>
 
       <button className="scenario-btn scenario-btn-ghost" onClick={reset}>
         ↺ Reset simulation

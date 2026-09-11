@@ -17,7 +17,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 360px;
+  width: 400px;
   z-index: 5;
   overflow-y: auto;
   padding: 16px 16px 24px;
@@ -58,7 +58,7 @@
 .view-tabs {
   position: absolute;
   top: 16px;
-  left: 376px;
+  left: 416px;
   right: 16px;
   z-index: 6;
   display: flex;
@@ -459,6 +459,33 @@ input[type="range"] {
 .slider-row span {
   display: block;
   margin-bottom: 4px;
+}
+
+.scenario-select {
+  display: block;
+  width: 100%;
+  background: rgba(248, 113, 113, 0.12);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  color: #fecaca;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.scenario-select:hover {
+  background: rgba(248, 113, 113, 0.2);
+}
+
+.scenario-select:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.scenario-select option {
+  background: #0f172a;
+  color: #e2e8f0;
 }
 
 .scenario-btn {

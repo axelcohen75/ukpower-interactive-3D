@@ -63,6 +63,12 @@ function GeneratorInspector({ id }: { id: string }) {
       </table>
 
       <p className="inspector-blurb">{FUEL_BLURB[def.type]}</p>
+
+      {def.realLinks && (
+        <p className="inspector-blurb" style={{ marginTop: 8, opacity: 0.75, fontStyle: "italic" }}>
+          Represents: {def.realLinks}
+        </p>
+      )}
     </>
   );
 }

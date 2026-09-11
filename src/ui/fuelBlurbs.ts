@@ -28,7 +28,7 @@ export const FUEL_BLURB: Record<FuelType, string> = {
   battery:
     "No fuel cost and near-instant response — the grid's fast defibrillator during a frequency dip. Energy-limited, so it's used for balancing seconds-to-minutes, not for sustained baseload.",
   interconnector:
-    "A subsea HVDC cable to another country's grid — physically a rectifier, a DC cable, and an inverter at the far end. Competes in the merit order at whatever price that power costs to import. Like wind and solar, it connects through power electronics, not a spinning shaft, so it adds no natural inertia — a growing share of GB's supply now comes with none.",
+    "Physically: one or more ±320-525kV DC cables laid on the seabed for hundreds of km, with a converter station at each end — a big industrial building doing AC→DC on the GB side and DC→AC on the other, the rectifier-and-inverter pair covered earlier. Most of the cost and loss sits in those stations (~0.6% each) rather than the cable itself (~3% per 1000km). Competes in the merit order at whatever price that power costs to import. Like wind and solar, it's power-electronics, not a spinning shaft, so it adds no natural inertia — a growing share of GB's supply now comes with none.",
 };
 
 export const FUEL_INERTIA_NOTE: Record<FuelType, string> = {

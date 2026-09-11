@@ -22,8 +22,11 @@ export interface GeneratorDef {
   rampRateMWps: number;
   /** Position in the 3D scene, in scene units */
   position: [number, number, number];
-  /** Interconnectors only: the country at the other end, for the flag/label. */
-  country?: string;
+  /** Interconnectors only: the countries this aggregate node represents. */
+  countries?: string[];
+  /** Interconnectors only: real constituent links this node aggregates,
+   *  e.g. "IFA, IFA2, ElecLink (France)" — shown in the inspector. */
+  realLinks?: string;
 }
 
 export interface GeneratorState {

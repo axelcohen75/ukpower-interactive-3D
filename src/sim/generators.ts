@@ -5,13 +5,20 @@ import type { GeneratorDef } from "./types";
  * real power stations, but scaled so the merit order, totals and clearing
  * price behave the way the real GB system does.
  *
- * Includes two HVDC interconnectors (France, Norway) as import-only supply
- * sources — real GB interconnectors can flow either direction, but this sim
- * only models importing, which is enough to teach the two things that
- * matter: they compete in the merit order like any other source, and,
- * being power-electronic links rather than spinning machines, they
- * contribute zero natural inertia — same category as wind, solar and
- * batteries.
+ * GB actually runs 9 HVDC interconnectors to 6 countries (~9.8GW combined):
+ * 3 to France (IFA, IFA2, ElecLink), BritNed to the Netherlands, Nemo Link
+ * to Belgium, Viking Link to Denmark, North Sea Link to Norway, and Moyle +
+ * EWIC to Ireland. Modelling all 9 separately would clutter the scene for
+ * no teaching benefit, so they're grouped into 3 real geographic clusters
+ * (Nordics / Western Europe / Ireland) at their true combined capacity and
+ * a representative blended price — see interconnector definitions below
+ * for exactly which real links each one stands in for.
+ *
+ * Import-only for simplicity — real interconnectors flow either direction,
+ * but modelling import is enough to teach what matters: they compete in
+ * the merit order like any other source, and, being power-electronic
+ * links rather than spinning machines, contribute zero natural inertia —
+ * same category as wind, solar and batteries.
  */
 export const GENERATORS: GeneratorDef[] = [
   {
@@ -95,26 +102,40 @@ export const GENERATORS: GeneratorDef[] = [
     position: [-19, 0, 3],
   },
   {
-    id: "interconnector-fr",
-    name: "Interconnector — France",
+    id: "interconnector-nordics",
+    name: "Interconnector — Nordics",
     type: "interconnector",
-    capacityMW: 2000,
-    srmc: 42,
+    capacityMW: 2800,
+    srmc: 39,
     inertiaFactor: 0,
-    rampRateMWps: 800,
-    position: [-13, 0, -6],
-    country: "France",
+    rampRateMWps: 900,
+    position: [-13, 0, -7],
+    countries: ["Norway", "Denmark"],
+    realLinks: "North Sea Link to Norway (1400MW) + Viking Link to Denmark (1400MW)",
   },
   {
-    id: "interconnector-no",
-    name: "Interconnector — Norway",
+    id: "interconnector-europe",
+    name: "Interconnector — Western Europe",
     type: "interconnector",
-    capacityMW: 1400,
-    srmc: 36,
+    capacityMW: 6000,
+    srmc: 46,
     inertiaFactor: 0,
-    rampRateMWps: 800,
-    position: [-13, 0, 6],
-    country: "Norway",
+    rampRateMWps: 900,
+    position: [-13, 0, 0],
+    countries: ["France", "Netherlands", "Belgium"],
+    realLinks: "IFA + IFA2 + ElecLink to France (4000MW) + BritNed to Netherlands (1000MW) + Nemo Link to Belgium (1000MW)",
+  },
+  {
+    id: "interconnector-ireland",
+    name: "Interconnector — Ireland",
+    type: "interconnector",
+    capacityMW: 1000,
+    srmc: 51,
+    inertiaFactor: 0,
+    rampRateMWps: 900,
+    position: [-13, 0, 7],
+    countries: ["Ireland"],
+    realLinks: "Moyle (500MW) + EWIC (500MW)",
   },
 ];
 

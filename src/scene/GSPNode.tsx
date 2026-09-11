@@ -17,6 +17,12 @@ export function GSPNode({ def }: { def: GSPDef }) {
   const dark = shedWeight >= totalWeight - 0.01;
   const selected = useUiStore((s) => s.selected?.type === "gsp" && s.selected.id === def.id);
   const setSelected = useUiStore((s) => s.setSelected);
+  const activeView = useUiStore((s) => s.activeView);
+  const inRelevantView = activeView === "distribution" || activeView === "consumption";
+  // Keep the label even outside those views when something's actually
+  // wrong here — a blackout is worth seeing at a glance, unlike the
+  // routine name/voltage.
+  const showLabel = hover || inRelevantView || dark || shedWeight > 0;
 
   return (
     <group
@@ -49,38 +55,40 @@ export function GSPNode({ def }: { def: GSPDef }) {
           emissiveIntensity={dark ? 0 : 0.5}
         />
       </mesh>
-      <Html position={[0, 3.3, 0]} center occlude style={{ pointerEvents: "none" }}>
-        <div
-          style={{
-            background: hover ? "rgba(17,24,39,0.95)" : "rgba(17,24,39,0.85)",
-            color: "white",
-            padding: "5px 9px",
-            borderRadius: 6,
-            fontSize: 11,
-            fontFamily: "system-ui, sans-serif",
-            whiteSpace: "nowrap",
-            border: dark ? "1px solid #ef4444" : "1px solid rgba(246,224,94,0.5)",
-            textAlign: "center",
-            pointerEvents: "none",
-          }}
-        >
-          <div style={{ fontWeight: 600 }}>{def.name} — substation</div>
-          {hover && (
-            <div style={{ fontWeight: 700, color: "#f6ad55", maxWidth: 190, whiteSpace: "normal", margin: "2px 0" }}>
-              Physical link, not a market player — just moves whatever power is needed.
+      {showLabel && (
+        <Html position={[0, 3.3, 0]} center occlude style={{ pointerEvents: "none" }}>
+          <div
+            style={{
+              background: hover ? "rgba(17,24,39,0.95)" : "rgba(17,24,39,0.85)",
+              color: "white",
+              padding: "5px 9px",
+              borderRadius: 6,
+              fontSize: 11,
+              fontFamily: "system-ui, sans-serif",
+              whiteSpace: "nowrap",
+              border: dark ? "1px solid #ef4444" : "1px solid rgba(246,224,94,0.5)",
+              textAlign: "center",
+              pointerEvents: "none",
+            }}
+          >
+            <div style={{ fontWeight: 600 }}>{def.name} — substation</div>
+            {hover && (
+              <div style={{ fontWeight: 700, color: "#f6ad55", maxWidth: 190, whiteSpace: "normal", margin: "2px 0" }}>
+                Physical link, not a market player — just moves whatever power is needed.
+              </div>
+            )}
+            <div style={{ opacity: 0.85 }}>
+              <span style={{ color: "#f6ad55" }}>400 kV</span> →{" "}
+              <span style={{ color: dark ? "#ef4444" : "#68d391" }}>33 kV</span>
             </div>
-          )}
-          <div style={{ opacity: 0.85 }}>
-            <span style={{ color: "#f6ad55" }}>400 kV</span> →{" "}
-            <span style={{ color: dark ? "#ef4444" : "#68d391" }}>33 kV</span>
+            {shedWeight > 0 && (
+              <div style={{ color: "#f87171" }}>
+                {dark ? "fully disconnected" : `${shedWeight.toFixed(0)}% shed`}
+              </div>
+            )}
           </div>
-          {shedWeight > 0 && (
-            <div style={{ color: "#f87171" }}>
-              {dark ? "fully disconnected" : `${shedWeight.toFixed(0)}% shed`}
-            </div>
-          )}
-        </div>
-      </Html>
+        </Html>
+      )}
     </group>
   );
 }
