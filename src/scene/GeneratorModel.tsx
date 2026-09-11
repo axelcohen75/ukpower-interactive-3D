@@ -92,9 +92,12 @@ function GasVisual({ color, stacks = 1 }: { color: string; stacks?: number }) {
   );
 }
 
-const COUNTRY_FLAG: Record<string, string> = {
-  France: "🇫🇷",
-  Norway: "🇳🇴",
+// Flag emoji don't render reliably on every OS/font (they fall back to
+// showing the raw two-letter code in a box), so use a small styled chip
+// instead — guaranteed to render the same everywhere.
+const COUNTRY_CHIP: Record<string, { code: string; color: string }> = {
+  France: { code: "FR", color: "#0055a4" },
+  Norway: { code: "NO", color: "#ba0c2f" },
 };
 
 function InterconnectorVisual({ color }: { color: string }) {
@@ -214,8 +217,23 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
             pointerEvents: "none",
           }}
         >
-          <div style={{ fontWeight: 600 }}>
-            {def.country ? `${COUNTRY_FLAG[def.country] ?? ""} ${FUEL_LABEL[def.type]} — ${def.country}` : FUEL_LABEL[def.type]}
+          <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: 5 }}>
+            {def.country && COUNTRY_CHIP[def.country] && (
+              <span
+                style={{
+                  background: COUNTRY_CHIP[def.country].color,
+                  color: "white",
+                  fontSize: 9,
+                  fontWeight: 800,
+                  padding: "1px 4px",
+                  borderRadius: 3,
+                  letterSpacing: "0.02em",
+                }}
+              >
+                {COUNTRY_CHIP[def.country].code}
+              </span>
+            )}
+            {def.country ? `${FUEL_LABEL[def.type]} — ${def.country}` : FUEL_LABEL[def.type]}
           </div>
           <div style={{ opacity: 0.85 }}>
             {tripped ? "TRIPPED — offline" : `${Math.round(actualMW).toLocaleString()} MW / ${def.capacityMW.toLocaleString()} MW`}

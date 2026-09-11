@@ -17,7 +17,8 @@ import { TownBlockModel } from "./TownBlockModel";
 import { Ground } from "./Ground";
 import { Sun } from "./Sun";
 import { CameraRig } from "./CameraRig";
-import { TierLabels } from "./TierLabels";
+import { ZoneHighlights } from "./ZoneHighlights";
+import { TrunkNode } from "./TrunkNode";
 
 function SimTicker() {
   useFrame((_, delta) => {
@@ -46,7 +47,7 @@ export function Scene() {
       <SimTicker />
       <CameraRig controlsRef={controlsRef} />
       <Ground />
-      <TierLabels />
+      <ZoneHighlights />
 
       {/* Tier 1: generation */}
       {GENERATORS.map((g) => (
@@ -69,10 +70,7 @@ export function Scene() {
       <Pylon position={[-26, 0, -6]} />
       <Pylon position={[-26, 0, 6]} />
       <Pylon position={[-15, 0, 0]} />
-      <mesh position={TRUNK_POSITION}>
-        <cylinderGeometry args={[0.25, 0.4, 1, 8]} />
-        <meshStandardMaterial color="#f6e05e" emissive="#f6e05e" emissiveIntensity={0.6} toneMapped={false} />
-      </mesh>
+      <TrunkNode position={TRUNK_POSITION} />
 
       {/* Trunk -> each Grid Supply Point, still transmission-tier (400kV) */}
       {GSPS.map((gsp) => (
