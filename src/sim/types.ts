@@ -43,3 +43,17 @@ export interface ScenarioCloud {
   /** seconds remaining in the cloud event */
   timeRemaining: number;
 }
+
+/**
+ * `normal` — physics runs as usual.
+ * `collapsed` — frequency fell below the collapse threshold; everything is
+ *   dark and frozen until the user runs a Black Start.
+ * `blackstart` — the scripted manual recovery sequence is playing out.
+ */
+export type SystemState = "normal" | "collapsed" | "blackstart";
+
+export interface BlackStartStep {
+  label: string;
+  durationS: number;
+}
+

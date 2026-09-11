@@ -5,6 +5,7 @@ import { MeritOrderPanel } from "./ui/MeritOrderPanel";
 import { ScenarioPanel } from "./ui/ScenarioPanel";
 import { Glossary } from "./ui/Glossary";
 import { IntroPanel } from "./ui/IntroPanel";
+import { SystemStatusBanner } from "./ui/SystemStatusBanner";
 import "./App.css";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
 
       <Glossary />
       <IntroPanel />
+      <SystemStatusBanner />
     </div>
   );
 }

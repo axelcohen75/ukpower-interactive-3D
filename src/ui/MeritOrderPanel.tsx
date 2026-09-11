@@ -9,10 +9,13 @@ const ORDERED = [...GENERATORS]
 export function MeritOrderPanel() {
   const generators = useSimStore((s) => s.generators);
   const demandMW = useSimStore((s) => s.demandMW);
+  const effectiveDemandMW = useSimStore((s) => s.effectiveDemandMW);
+  const activeLfddStages = useSimStore((s) => s.activeLfddStages);
   const clearingPrice = useSimStore((s) => s.clearingPriceGBPPerMWh);
   const marginalId = useSimStore((s) => s.marginalGeneratorId);
 
-  const demandMarkerPct = Math.min(100, (demandMW / TOTAL_CAPACITY_MW) * 100);
+  const demandMarkerPct = Math.min(100, (effectiveDemandMW / TOTAL_CAPACITY_MW) * 100);
+  const shedMW = demandMW - effectiveDemandMW;
 
   return (
     <div className="panel">
@@ -47,10 +50,17 @@ export function MeritOrderPanel() {
             );
           })}
           <div className="demand-marker" style={{ left: `${demandMarkerPct}%` }}>
-            <div className="demand-marker-label">demand</div>
+            <div className="demand-marker-label">demand{activeLfddStages > 0 ? " (after shedding)" : ""}</div>
           </div>
         </div>
       </div>
+
+      {activeLfddStages > 0 && (
+        <div className="lfdd-note">
+          LFDD stage {activeLfddStages}/9 active — {Math.round(shedMW).toLocaleString()} MW of demand
+          disconnected so generation doesn't have to cover it.
+        </div>
+      )}
 
       <div className="clearing-price">
         Clearing price:{" "}
