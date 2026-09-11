@@ -6,6 +6,8 @@ import { ScenarioPanel } from "./ui/ScenarioPanel";
 import { Glossary } from "./ui/Glossary";
 import { IntroPanel } from "./ui/IntroPanel";
 import { SystemStatusBanner } from "./ui/SystemStatusBanner";
+import { ViewTabs } from "./ui/ViewTabs";
+import { InspectorPanel } from "./ui/InspectorPanel";
 import "./App.css";
 
 function App() {
@@ -20,6 +22,8 @@ function App() {
         </div>
       </header>
 
+      <ViewTabs />
+
       <div className="overlay-right">
         <FrequencyGauge />
       </div>
@@ -30,6 +34,7 @@ function App() {
         <ScenarioPanel />
       </div>
 
+      <InspectorPanel />
       <Glossary />
       <IntroPanel />
       <SystemStatusBanner />

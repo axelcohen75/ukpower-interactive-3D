@@ -31,6 +31,156 @@
   margin-top: 2px;
 }
 
+/* --- view tabs --- */
+.view-tabs {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.view-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.view-tab:hover {
+  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.view-tab-active {
+  background: rgba(148, 163, 184, 0.12);
+}
+
+@media (max-width: 900px) {
+  .view-tabs {
+    left: 16px;
+    right: 16px;
+    transform: none;
+    justify-content: space-between;
+  }
+  .view-tab {
+    padding: 6px 6px;
+    font-size: 10px;
+  }
+}
+
+/* --- inspector panel --- */
+.inspector-panel {
+  position: absolute;
+  top: 72px;
+  left: 16px;
+  z-index: 6;
+  width: 280px;
+  max-height: calc(100vh - 340px);
+  overflow-y: auto;
+}
+
+.inspector-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.inspector-close:hover {
+  color: #f8fafc;
+}
+
+.inspector-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-right: 16px;
+}
+
+.inspector-header .dot {
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.inspector-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.inspector-bar-row {
+  margin-bottom: 10px;
+}
+
+.inspector-bar-track {
+  height: 8px;
+  border-radius: 4px;
+  background: #1e293b;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.inspector-bar-fill {
+  height: 100%;
+}
+
+.inspector-bar-label {
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.inspector-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.inspector-table td {
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+}
+
+.inspector-table td:last-child {
+  text-align: right;
+  color: #e2e8f0;
+}
+
+.inspector-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 6px;
+}
+
+.inspector-blurb {
+  font-size: 12px;
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin: 0;
+}
+
 .panel {
   background: rgba(15, 23, 42, 0.82);
   backdrop-filter: blur(10px);
@@ -192,6 +342,7 @@ input[type="range"] {
 
 /* --- merit order --- */
 .merit-bar-wrap {
+  margin-top: 20px;
   margin-bottom: 8px;
 }
 

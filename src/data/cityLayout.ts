@@ -33,30 +33,32 @@ export interface TownBlockDef {
  * "neck" of the funnel. */
 export const TRUNK_POSITION: [number, number, number] = [-11, 2.5, 0];
 
+// Kept shallow in Z (unlike a literal map) so each focused camera view can
+// frame a whole tier without part of it projecting behind the 2D UI panels.
 export const GSPS: GSPDef[] = [
-  { id: "gsp-north", name: "GSP North", position: [9, 1, -13] },
+  { id: "gsp-north", name: "GSP North", position: [9, 1, -4] },
   { id: "gsp-central", name: "GSP Central", position: [11, 1, 0] },
-  { id: "gsp-south", name: "GSP South", position: [9, 1, 13] },
+  { id: "gsp-south", name: "GSP South", position: [9, 1, 4] },
 ];
 
 export const TOWN_BLOCKS: TownBlockDef[] = [
   // GSP South — LFDD stages 1-3 shed this GSP first
-  { id: "south-res-1", gspId: "gsp-south", name: "Southfield Estate", kind: "residential", weight: 5, position: [16, 0, 16.5] },
-  { id: "south-res-2", gspId: "gsp-south", name: "Riverside Homes", kind: "residential", weight: 7, position: [21, 0, 13] },
-  { id: "south-com-1", gspId: "gsp-south", name: "Southgate Retail Park", kind: "commercial", weight: 7, position: [16, 0, 9.5] },
-  { id: "south-protected", gspId: "gsp-south", name: "St Mary's Hospital", kind: "protected", weight: 13, position: [23, 0, 18.5] },
+  { id: "south-res-1", gspId: "gsp-south", name: "Southfield Estate", kind: "residential", weight: 5, position: [16, 0, 6.5] },
+  { id: "south-res-2", gspId: "gsp-south", name: "Riverside Homes", kind: "residential", weight: 7, position: [19.5, 0, 5] },
+  { id: "south-com-1", gspId: "gsp-south", name: "Southgate Retail Park", kind: "commercial", weight: 7, position: [16, 0, 3.5] },
+  { id: "south-protected", gspId: "gsp-south", name: "St Mary's Hospital", kind: "protected", weight: 13, position: [23, 0, 6] },
 
   // GSP Central — LFDD stages 4-6
-  { id: "central-res-1", gspId: "gsp-central", name: "Elm Street", kind: "residential", weight: 7, position: [17.5, 0, 4.5] },
-  { id: "central-com-1", gspId: "gsp-central", name: "High Street", kind: "commercial", weight: 7, position: [22, 0, 0] },
-  { id: "central-res-2", gspId: "gsp-central", name: "Oakwood Close", kind: "residential", weight: 6, position: [17.5, 0, -4.5] },
-  { id: "central-protected", gspId: "gsp-central", name: "Water Treatment Works", kind: "protected", weight: 13, position: [24, 0, -6.5] },
+  { id: "central-res-1", gspId: "gsp-central", name: "Elm Street", kind: "residential", weight: 7, position: [16.5, 0, 1.5] },
+  { id: "central-com-1", gspId: "gsp-central", name: "High Street", kind: "commercial", weight: 7, position: [20, 0, 0] },
+  { id: "central-res-2", gspId: "gsp-central", name: "Oakwood Close", kind: "residential", weight: 6, position: [16.5, 0, -1.5] },
+  { id: "central-protected", gspId: "gsp-central", name: "Water Treatment Works", kind: "protected", weight: 13, position: [23, 0, 0] },
 
   // GSP North — LFDD stages 7-9
-  { id: "north-res-1", gspId: "gsp-north", name: "Northgate Terrace", kind: "residential", weight: 7, position: [16, 0, -9.5] },
-  { id: "north-com-1", gspId: "gsp-north", name: "Northgate Retail Park", kind: "commercial", weight: 7, position: [16, 0, -16.5] },
-  { id: "north-res-2", gspId: "gsp-north", name: "Millfield Rise", kind: "residential", weight: 7, position: [21, 0, -13] },
-  { id: "north-protected", gspId: "gsp-north", name: "Rail Depot", kind: "protected", weight: 14, position: [23, 0, -20] },
+  { id: "north-res-1", gspId: "gsp-north", name: "Northgate Terrace", kind: "residential", weight: 7, position: [16, 0, -3.5] },
+  { id: "north-com-1", gspId: "gsp-north", name: "Northgate Retail Park", kind: "commercial", weight: 7, position: [16, 0, -6.5] },
+  { id: "north-res-2", gspId: "gsp-north", name: "Millfield Rise", kind: "residential", weight: 7, position: [19.5, 0, -5] },
+  { id: "north-protected", gspId: "gsp-north", name: "Rail Depot", kind: "protected", weight: 14, position: [23, 0, -6] },
 ];
 
 /**

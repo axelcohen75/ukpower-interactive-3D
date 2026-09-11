@@ -1,9 +1,13 @@
+import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { GENERATORS } from "../sim/generators";
 import { useSimStore, isBlockShed } from "../sim/store";
 import { FUEL_COLOR } from "../sim/dispatch";
 import { GSPS, TOWN_BLOCKS, TRUNK_POSITION } from "../data/cityLayout";
+import { useUiStore } from "../ui/uiStore";
+import { VIEWS } from "./views";
 import { GeneratorModel } from "./GeneratorModel";
 import { PowerLine } from "./PowerLine";
 import { Pylon } from "./Pylon";
@@ -12,6 +16,8 @@ import { gspFlowMW } from "./gspFlow";
 import { TownBlockModel } from "./TownBlockModel";
 import { Ground } from "./Ground";
 import { Sun } from "./Sun";
+import { CameraRig } from "./CameraRig";
+import { TierLabels } from "./TierLabels";
 
 function SimTicker() {
   useFrame((_, delta) => {
@@ -23,11 +29,14 @@ function SimTicker() {
 const TRANSMISSION_MAX_MW = 20000;
 
 export function Scene() {
+  const controlsRef = useRef<OrbitControlsImpl>(null);
+
   return (
     <Canvas
       shadows
-      camera={{ position: [-8, 42, 70], fov: 46 }}
+      camera={{ position: VIEWS.overview.position, fov: 46 }}
       style={{ background: "linear-gradient(#0b1120,#0b1120)" }}
+      onPointerMissed={() => useUiStore.getState().setSelected(null)}
     >
       <color attach="background" args={["#0b1120"]} />
       <fog attach="fog" args={["#0b1120", 55, 110]} />
@@ -35,7 +44,9 @@ export function Scene() {
       <Sun />
 
       <SimTicker />
+      <CameraRig controlsRef={controlsRef} />
       <Ground />
+      <TierLabels />
 
       {/* Tier 1: generation */}
       {GENERATORS.map((g) => (
@@ -55,9 +66,9 @@ export function Scene() {
         />
       ))}
 
-      <Pylon position={[-26, 0, -9]} />
-      <Pylon position={[-26, 0, 9]} />
-      <Pylon position={[-17, 0, 0]} />
+      <Pylon position={[-26, 0, -6]} />
+      <Pylon position={[-26, 0, 6]} />
+      <Pylon position={[-15, 0, 0]} />
       <mesh position={TRUNK_POSITION}>
         <cylinderGeometry args={[0.25, 0.4, 1, 8]} />
         <meshStandardMaterial color="#f6e05e" emissive="#f6e05e" emissiveIntensity={0.6} toneMapped={false} />
@@ -76,8 +87,8 @@ export function Scene() {
         />
       ))}
 
-      <Pylon position={[-2, 0, -8]} />
-      <Pylon position={[-2, 0, 8]} />
+      <Pylon position={[-2, 0, -3]} />
+      <Pylon position={[-2, 0, 3]} />
       <Pylon position={[3, 0, 0]} />
 
       {/* Tier 3: Grid Supply Points — the visible step-down */}
@@ -111,10 +122,13 @@ export function Scene() {
       ))}
 
       <OrbitControls
-        target={[-4, 5, 0]}
-        maxPolarAngle={Math.PI / 2.05}
-        minDistance={14}
-        maxDistance={110}
+        ref={controlsRef}
+        target={VIEWS.overview.target}
+        enableRotate={false}
+        enablePan={false}
+        enableZoom={true}
+        minDistance={10}
+        maxDistance={95}
       />
     </Canvas>
   );

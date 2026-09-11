@@ -118,7 +118,7 @@ export function TownBlockModel({ def }: { def: TownBlockDef }) {
       {/* Only label a block when there's something worth drawing the eye to
           — a blackout, or a protected site — to keep the normal view clean. */}
       {(dark || def.kind === "protected") && (
-        <Html position={[0, 2.6, 0]} center distanceFactor={26} occlude>
+        <Html position={[0, 2.6, 0]} center occlude style={{ pointerEvents: "none" }}>
           <div
             style={{
               background: "rgba(17,24,39,0.8)",

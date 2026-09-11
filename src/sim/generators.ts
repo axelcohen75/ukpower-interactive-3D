@@ -14,7 +14,7 @@ export const GENERATORS: GeneratorDef[] = [
     srmc: 6,
     inertiaFactor: 1,
     rampRateMWps: 5,
-    position: [-30, 0, -14],
+    position: [-34, 0, -3],
   },
   {
     id: "wind",
@@ -24,7 +24,7 @@ export const GENERATORS: GeneratorDef[] = [
     srmc: 2,
     inertiaFactor: 0,
     rampRateMWps: 3000,
-    position: [-30, 0, -5],
+    position: [-29, 0, -3],
   },
   {
     id: "solar",
@@ -34,7 +34,7 @@ export const GENERATORS: GeneratorDef[] = [
     srmc: 1,
     inertiaFactor: 0,
     rampRateMWps: 4000,
-    position: [-30, 0, 5],
+    position: [-24, 0, -3],
   },
   {
     id: "hydro",
@@ -44,7 +44,7 @@ export const GENERATORS: GeneratorDef[] = [
     srmc: 20,
     inertiaFactor: 0.6,
     rampRateMWps: 200,
-    position: [-30, 0, 14],
+    position: [-19, 0, -3],
   },
   {
     id: "ccgt-a",
@@ -54,7 +54,7 @@ export const GENERATORS: GeneratorDef[] = [
     srmc: 58,
     inertiaFactor: 0.7,
     rampRateMWps: 120,
-    position: [-21, 0, -14],
+    position: [-34, 0, 3],
   },
   {
     id: "ccgt-b",
@@ -64,7 +64,7 @@ export const GENERATORS: GeneratorDef[] = [
     srmc: 78,
     inertiaFactor: 0.7,
     rampRateMWps: 100,
-    position: [-21, 0, -5],
+    position: [-29, 0, 3],
   },
   {
     id: "peaker",
@@ -74,7 +74,7 @@ export const GENERATORS: GeneratorDef[] = [
     srmc: 165,
     inertiaFactor: 0.4,
     rampRateMWps: 400,
-    position: [-21, 0, 5],
+    position: [-24, 0, 3],
   },
   {
     id: "battery",
@@ -84,7 +84,7 @@ export const GENERATORS: GeneratorDef[] = [
     srmc: 0,
     inertiaFactor: 0,
     rampRateMWps: 2000,
-    position: [-21, 0, 14],
+    position: [-19, 0, 3],
   },
 ];
 

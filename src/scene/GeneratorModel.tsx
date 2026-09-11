@@ -1,9 +1,10 @@
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
+import { Html, useCursor } from "@react-three/drei";
 import * as THREE from "three";
 import type { GeneratorDef } from "../sim/types";
 import { useSimStore } from "../sim/store";
+import { useUiStore } from "../ui/uiStore";
 import { FUEL_COLOR, FUEL_LABEL } from "../sim/dispatch";
 
 function NuclearVisual({ color }: { color: string }) {
@@ -107,7 +108,12 @@ function BatteryVisual({ color }: { color: string }) {
 export function GeneratorModel({ def }: { def: GeneratorDef }) {
   const spinRef = useRef<THREE.Group>(null);
   const [hover, setHover] = useState(false);
+  useCursor(hover);
   const color = FUEL_COLOR[def.type];
+  const selected = useUiStore(
+    (s) => s.selected?.type === "generator" && s.selected.id === def.id,
+  );
+  const setSelected = useUiStore((s) => s.setSelected);
 
   useFrame((_, delta) => {
     if (spinRef.current) {
@@ -124,9 +130,22 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
   return (
     <group
       position={def.position}
-      onPointerOver={() => setHover(true)}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHover(true);
+      }}
       onPointerOut={() => setHover(false)}
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelected(selected ? null : { type: "generator", id: def.id });
+      }}
     >
+      {selected && (
+        <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[1.9, 2.15, 32]} />
+          <meshBasicMaterial color="#38bdf8" toneMapped={false} transparent opacity={0.85} />
+        </mesh>
+      )}
       {def.type === "nuclear" && <NuclearVisual color={color} />}
       {def.type === "wind" && <WindVisual color={color} spinRef={spinRef} />}
       {def.type === "solar" && <SolarVisual color={color} />}
@@ -150,7 +169,7 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
         />
       </mesh>
 
-      <Html position={[0, 4.4, 0]} center distanceFactor={22} occlude>
+      <Html position={[0, 4.4, 0]} center occlude style={{ pointerEvents: "none" }}>
         <div
           style={{
             background: hover ? "rgba(17,24,39,0.95)" : "rgba(17,24,39,0.75)",
