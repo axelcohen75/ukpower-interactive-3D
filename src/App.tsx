@@ -2,6 +2,8 @@ import { Scene } from "./scene/Scene";
 import { FrequencyGauge } from "./ui/FrequencyGauge";
 import { DemandPanel } from "./ui/DemandPanel";
 import { MeritOrderPanel } from "./ui/MeritOrderPanel";
+import { PriceHistoryPanel } from "./ui/PriceHistoryPanel";
+import { BaseloadChart } from "./ui/BaseloadChart";
 import { ScenarioPanel } from "./ui/ScenarioPanel";
 import { Glossary } from "./ui/Glossary";
 import { IntroPanel } from "./ui/IntroPanel";
@@ -24,13 +26,17 @@ function App() {
             Generation → Transmission → Distribution → Consumption
           </div>
         </div>
-        <FrequencyGauge />
         <DemandPanel />
         <MeritOrderPanel />
+        <PriceHistoryPanel />
+        <BaseloadChart />
         <ScenarioPanel />
       </aside>
 
-      <InspectorPanel />
+      <div className="right-hud">
+        <FrequencyGauge />
+        <InspectorPanel />
+      </div>
       <Glossary />
       <IntroPanel />
       <SystemStatusBanner />

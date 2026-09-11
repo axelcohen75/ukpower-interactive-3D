@@ -17,7 +17,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 400px;
+  width: 440px;
   z-index: 5;
   overflow-y: auto;
   padding: 16px 16px 24px;
@@ -58,7 +58,7 @@
 .view-tabs {
   position: absolute;
   top: 16px;
-  left: 416px;
+  left: 456px;
   right: 16px;
   z-index: 6;
   display: flex;
@@ -109,22 +109,37 @@
   }
 }
 
-/* --- inspector panel --- */
-.inspector-panel {
+/* --- right-side floating HUD: frequency gauge + inspector, stacked --- */
+.right-hud {
   position: absolute;
   top: 72px;
   right: 16px;
   z-index: 6;
-  width: 300px;
-  max-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  max-height: calc(100vh - 88px);
+}
+
+.right-hud .panel {
+  width: 260px;
+}
+
+.inspector-panel {
+  min-height: 0;
   overflow-y: auto;
+  flex-shrink: 1;
 }
 
 @media (max-width: 760px) {
-  .inspector-panel {
+  .right-hud {
     top: calc(60vh + 48px);
     right: 8px;
     left: 8px;
+    max-height: none;
+  }
+  .right-hud .panel {
     width: auto;
   }
 }
@@ -344,6 +359,23 @@ input[type="range"] {
   accent-color: #38bdf8;
 }
 
+.slider-with-marker {
+  position: relative;
+  padding-top: 12px;
+}
+
+.baseload-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid #fbbf24;
+  pointer-events: none;
+}
+
 /* --- merit order --- */
 .merit-bar-wrap {
   margin-top: 20px;
@@ -446,6 +478,38 @@ input[type="range"] {
   height: 8px;
   border-radius: 50%;
   margin-right: 6px;
+}
+
+/* --- baseload chart --- */
+.baseload-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 8px;
+}
+
+.baseload-legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 10.5px;
+  color: #cbd5e1;
+}
+
+.baseload-note {
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+/* --- clearing price history --- */
+.price-history-readout {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #94a3b8;
 }
 
 /* --- scenario panel --- */

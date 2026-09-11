@@ -14,9 +14,12 @@ export interface DispatchResult {
 
 /**
  * Cheapest-first economic dispatch (the "merit order"). Battery storage is
- * excluded from ordinary economic dispatch here — in the real system it is
- * energy-limited and mainly used for fast balancing/frequency response,
- * which the sim triggers separately.
+ * excluded from this specific dispatch step — not because real batteries
+ * don't bid: GB batteries actively bid wholesale (arbitrage), the Balancing
+ * Mechanism, the Capacity Market, and especially frequency response, where
+ * their millisecond reaction time beats any thermal plant. This sim only
+ * models that last role (triggered separately, see store.ts) to keep the
+ * merit-order demo legible — a simplification of the sim, not of reality.
  */
 export function dispatch(
   demandMW: number,

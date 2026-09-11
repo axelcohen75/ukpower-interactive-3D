@@ -108,6 +108,8 @@ interface SimState {
   totalSupplyMW: number;
   clearingPriceGBPPerMWh: number;
   marginalGeneratorId: string | null;
+  priceHistory: number[]; // rolling window of clearing price samples, ~1/s
+  priceHistorySampledAtS: number;
 
   activeLfddStages: number; // 0-9
   lfddStableSinceS: number | null;
@@ -156,6 +158,8 @@ export const useSimStore = create<SimState>((set, get) => ({
   totalSupplyMW: 0,
   clearingPriceGBPPerMWh: 0,
   marginalGeneratorId: null,
+  priceHistory: [],
+  priceHistorySampledAtS: 0,
 
   activeLfddStages: 0,
   lfddStableSinceS: null,
@@ -236,6 +240,8 @@ export const useSimStore = create<SimState>((set, get) => ({
       rocofHzPerS: 0,
       clearingPriceGBPPerMWh: 0,
       marginalGeneratorId: null,
+      priceHistory: [],
+      priceHistorySampledAtS: 0,
       activeLfddStages: 0,
       lfddStableSinceS: null,
       lfddRestoreCooldownUntilS: 0,
@@ -400,6 +406,13 @@ export const useSimStore = create<SimState>((set, get) => ({
     const { targets, clearingPriceGBPPerMWh, marginalGeneratorId } =
       economicDispatch(effectiveDemandMW, availability, s.trippedIds);
 
+    let priceHistory = s.priceHistory;
+    let priceHistorySampledAtS = s.priceHistorySampledAtS;
+    if (simClockS - priceHistorySampledAtS >= 1) {
+      priceHistory = [...priceHistory, clearingPriceGBPPerMWh].slice(-90);
+      priceHistorySampledAtS = simClockS;
+    }
+
     // --- ramp actual output toward target per generator ---
     const isFirstTick = s.simClockS === 0;
     const generators: Record<string, GeneratorState> = {};
@@ -473,6 +486,8 @@ export const useSimStore = create<SimState>((set, get) => ({
         totalSupplyMW,
         clearingPriceGBPPerMWh,
         marginalGeneratorId,
+        priceHistory,
+        priceHistorySampledAtS,
         frequencyHz,
         rocofHzPerS,
         activeLfddStages: 9,
@@ -519,6 +534,8 @@ export const useSimStore = create<SimState>((set, get) => ({
       totalSupplyMW,
       clearingPriceGBPPerMWh,
       marginalGeneratorId,
+      priceHistory,
+      priceHistorySampledAtS,
       frequencyHz,
       rocofHzPerS,
       activeLfddStages,

@@ -24,7 +24,7 @@ export const VIEWS: Record<ViewId, ViewDef> = {
   generation: {
     label: "1. Génération",
     shortLabel: "Génération",
-    position: [-30.5, 17, 19],
+    position: [-30.5, 21, 25],
     target: [-30.5, 4, 0],
     color: "#f2c744",
   },
@@ -38,7 +38,7 @@ export const VIEWS: Record<ViewId, ViewDef> = {
   distribution: {
     label: "3. Distribution",
     shortLabel: "Distribution",
-    position: [6, 18, 20],
+    position: [6, 28, 35],
     target: [6, 4, 0],
     color: "#68d391",
   },

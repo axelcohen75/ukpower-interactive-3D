@@ -8,7 +8,7 @@ export const MARKET_ROLE: Record<FuelType, string> = {
   hydro: "Cheap and fast-reacting — flexes ahead of gas when needed.",
   ccgt: "The system's workhorse — flexes to cover what renewables miss.",
   peaker: "Called on only at peak — usually sets the price everyone pays.",
-  battery: "Not a market bidder — a fast reserve for balancing, not baseload.",
+  battery: "Bids across several markets at once — wholesale arbitrage, the Balancing Mechanism, Capacity Market — and dominates frequency response, where millisecond reaction time beats any thermal plant.",
   interconnector: "Imported power — competes on price like any home generator.",
 };
 
@@ -26,7 +26,7 @@ export const FUEL_BLURB: Record<FuelType, string> = {
   peaker:
     "Fast-starting but expensive open-cycle gas turbines, only called on right at the top of demand. Its high cost is usually what sets the clearing price at peak.",
   battery:
-    "No fuel cost and near-instant response — the grid's fast defibrillator during a frequency dip. Energy-limited, so it's used for balancing seconds-to-minutes, not for sustained baseload.",
+    "No fuel cost and a response time measured in milliseconds — unbeatable by any thermal plant for frequency services (Dynamic Containment/Moderation/Regulation), where GB batteries do most of their business today. In reality they also arbitrage the wholesale price (charge cheap, discharge dear), bid into the Balancing Mechanism, and hold Capacity Market contracts — de-rated by how many hours they can sustain output. This sim only animates the frequency-response role below, to keep the cause-and-effect demo readable, not because that's all a battery does.",
   interconnector:
     "Physically: one or more ±320-525kV DC cables laid on the seabed for hundreds of km, with a converter station at each end — a big industrial building doing AC→DC on the GB side and DC→AC on the other, the rectifier-and-inverter pair covered earlier. Most of the cost and loss sits in those stations (~0.6% each) rather than the cable itself (~3% per 1000km). Competes in the merit order at whatever price that power costs to import. Like wind and solar, it's power-electronics, not a spinning shaft, so it adds no natural inertia — a growing share of GB's supply now comes with none.",
 };

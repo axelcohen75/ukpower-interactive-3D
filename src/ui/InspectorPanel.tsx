@@ -3,6 +3,7 @@ import { useSimStore, isBlockShed } from "../sim/store";
 import { GENERATORS } from "../sim/generators";
 import { FUEL_COLOR, FUEL_LABEL } from "../sim/dispatch";
 import { FUEL_BLURB, FUEL_INERTIA_NOTE } from "./fuelBlurbs";
+import { TYPICAL_CAPACITY_FACTOR } from "../sim/baseload";
 import { GSPS, TOWN_BLOCKS } from "../data/cityLayout";
 
 function rampDescription(rampRateMWps: number, capacityMW: number): string {
@@ -59,8 +60,17 @@ function GeneratorInspector({ id }: { id: string }) {
             <td>Ramp speed</td>
             <td>{rampDescription(def.rampRateMWps, def.capacityMW)}</td>
           </tr>
+          <tr>
+            <td>Typical capacity factor</td>
+            <td>{TYPICAL_CAPACITY_FACTOR[def.type]}</td>
+          </tr>
         </tbody>
       </table>
+      <p className="inspector-blurb" style={{ opacity: 0.65, fontStyle: "italic", marginBottom: 10 }}>
+        Capacity factor = real-world annual output ÷ nameplate capacity —
+        it's why peakers get paid to be <em>available</em> (Capacity Market),
+        not just for what they produce.
+      </p>
 
       <p className="inspector-blurb">{FUEL_BLURB[def.type]}</p>
 

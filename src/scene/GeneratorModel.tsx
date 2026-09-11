@@ -11,13 +11,34 @@ import { MARKET_ROLE } from "../ui/fuelBlurbs";
 function NuclearVisual({ color }: { color: string }) {
   return (
     <group>
-      <mesh position={[0, 1.4, 0]}>
-        <cylinderGeometry args={[1.1, 1.5, 2.8, 16]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={0.8} />
+      {/* cooling tower — hyperboloid silhouette via two stacked tapered cylinders */}
+      <mesh position={[0, 0.9, 0]}>
+        <cylinderGeometry args={[1.25, 1.55, 1.8, 20]} />
+        <meshStandardMaterial color="#e2e8f0" roughness={0.85} />
       </mesh>
+      <mesh position={[0, 2.3, 0]}>
+        <cylinderGeometry args={[1.1, 1.25, 1, 20]} />
+        <meshStandardMaterial color="#e2e8f0" roughness={0.85} />
+      </mesh>
+      {/* horizontal texture rings */}
+      {[0.5, 1.3, 2.1].map((h) => (
+        <mesh key={h} position={[0, h, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[1.1 + (1.5 - h * 0.15) * 0.05, 0.03, 6, 24]} />
+          <meshStandardMaterial color="#94a3b8" roughness={0.9} />
+        </mesh>
+      ))}
       <mesh position={[0, 3, 0]}>
         <sphereGeometry args={[0.4, 12, 12]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+      </mesh>
+      {/* adjacent reactor building */}
+      <mesh position={[1.9, 0.55, 0.3]}>
+        <boxGeometry args={[1.1, 1.1, 1]} />
+        <meshStandardMaterial color="#cbd5e1" roughness={0.7} />
+      </mesh>
+      <mesh position={[1.9, 1.2, 0.3]}>
+        <sphereGeometry args={[0.58, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#cbd5e1" roughness={0.7} />
       </mesh>
     </group>
   );
@@ -29,6 +50,11 @@ function WindVisual({ color, spinRef }: { color: string; spinRef: React.RefObjec
       <mesh position={[0, 1.8, 0]}>
         <cylinderGeometry args={[0.1, 0.16, 3.6, 8]} />
         <meshStandardMaterial color="#f7fafc" />
+      </mesh>
+      {/* nacelle housing behind the hub */}
+      <mesh position={[-0.28, 3.6, 0]}>
+        <boxGeometry args={[0.55, 0.24, 0.24]} />
+        <meshStandardMaterial color="#e2e8f0" roughness={0.6} />
       </mesh>
       <group ref={spinRef} position={[0, 3.6, 0]}>
         <mesh>
@@ -59,11 +85,32 @@ function SolarVisual({ color }: { color: string }) {
     }
   }
   return (
-    <group rotation={[-0.4, 0, 0]} position={[0, 0.8, 0]}>
-      {cells.map(([x, z]) => (
-        <mesh key={`${x}-${z}`} position={[x * 0.9, 0, z * 0.9]}>
-          <boxGeometry args={[0.8, 0.06, 0.8]} />
-          <meshStandardMaterial color={color} metalness={0.3} roughness={0.4} />
+    <group>
+      <group rotation={[-0.4, 0, 0]} position={[0, 0.8, 0]}>
+        {cells.map(([x, z]) => (
+          <group key={`${x}-${z}`} position={[x * 0.9, 0, z * 0.9]}>
+            {/* dark frame behind the cell, slightly larger */}
+            <mesh position={[0, -0.02, 0]}>
+              <boxGeometry args={[0.86, 0.04, 0.86]} />
+              <meshStandardMaterial color="#1e293b" roughness={0.8} />
+            </mesh>
+            <mesh>
+              <boxGeometry args={[0.76, 0.05, 0.76]} />
+              <meshStandardMaterial color={color} metalness={0.4} roughness={0.25} />
+            </mesh>
+            {/* cell grid lines */}
+            <mesh position={[0, 0.03, 0]}>
+              <boxGeometry args={[0.02, 0.01, 0.76]} />
+              <meshStandardMaterial color="#1e293b" />
+            </mesh>
+          </group>
+        ))}
+      </group>
+      {/* support struts to the ground */}
+      {[-0.9, 0.9].map((x) => (
+        <mesh key={x} position={[x, 0.35, 0.7]} rotation={[-0.4, 0, 0]}>
+          <cylinderGeometry args={[0.05, 0.05, 0.9, 6]} />
+          <meshStandardMaterial color="#64748b" />
         </mesh>
       ))}
     </group>
@@ -73,31 +120,134 @@ function SolarVisual({ color }: { color: string }) {
 function HydroVisual({ color }: { color: string }) {
   return (
     <group>
+      {/* dam wall */}
       <mesh position={[0, 0.8, 0]}>
         <boxGeometry args={[2.4, 1.6, 1.6]} />
         <meshStandardMaterial color="#a0aec0" />
       </mesh>
+      {/* sluice gate stripes */}
+      {[-0.8, 0, 0.8].map((x) => (
+        <mesh key={x} position={[x, 0.8, 0.81]}>
+          <boxGeometry args={[0.35, 1.5, 0.03]} />
+          <meshStandardMaterial color="#4a5568" />
+        </mesh>
+      ))}
+      {/* spillway / water outflow */}
       <mesh position={[0, 0.3, 1.1]}>
         <boxGeometry args={[2.6, 0.15, 0.6]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.4} />
+      </mesh>
+      {/* generator house on top */}
+      <mesh position={[0, 1.85, -0.2]}>
+        <boxGeometry args={[1.3, 0.5, 0.9]} />
+        <meshStandardMaterial color="#e2e8f0" roughness={0.6} />
+      </mesh>
+      <mesh position={[0, 2.16, -0.2]}>
+        <boxGeometry args={[1.4, 0.12, 1]} />
+        <meshStandardMaterial color="#475569" />
       </mesh>
     </group>
   );
 }
 
-function GasVisual({ color, stacks = 1 }: { color: string; stacks?: number }) {
+let sharedSmokeTexture: THREE.CanvasTexture | null = null;
+function getSmokeTexture(): THREE.CanvasTexture {
+  if (sharedSmokeTexture) return sharedSmokeTexture;
+  const size = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, "rgba(255,255,255,0.9)");
+  grad.addColorStop(0.6, "rgba(255,255,255,0.25)");
+  grad.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  sharedSmokeTexture = new THREE.CanvasTexture(canvas);
+  return sharedSmokeTexture;
+}
+
+/** Rising, fading exhaust puffs above a stack — visible only once the plant
+ *  is actually producing, so an idle peaker reads as visibly "off" and a
+ *  dispatched one reads as visibly "started up", not just a number change. */
+function StackExhaust({ loadFrac, offsetX }: { loadFrac: number; offsetX: number }) {
+  const texture = getSmokeTexture();
+  const refs = useRef<(THREE.Sprite | null)[]>([]);
+  const PUFF_COUNT = 3;
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    for (let i = 0; i < PUFF_COUNT; i++) {
+      const sprite = refs.current[i];
+      if (!sprite) continue;
+      const phase = (t * (0.35 + loadFrac * 0.5) + i / PUFF_COUNT) % 1;
+      sprite.position.set(offsetX, 2.85 + phase * 1.7, 0);
+      sprite.scale.setScalar(0.22 + phase * 0.5);
+      const mat = sprite.material as THREE.SpriteMaterial;
+      mat.opacity = loadFrac > 0.03 ? (1 - phase) * Math.min(1, loadFrac * 1.5) * 0.55 : 0;
+    }
+  });
+
+  return (
+    <group>
+      {Array.from({ length: PUFF_COUNT }).map((_, i) => (
+        <sprite
+          key={i}
+          ref={(el) => {
+            refs.current[i] = el;
+          }}
+          position={[offsetX, 2.85, 0]}
+        >
+          <spriteMaterial map={texture} transparent depthWrite={false} opacity={0} color="#cbd5e1" />
+        </sprite>
+      ))}
+    </group>
+  );
+}
+
+function GasVisual({ color, stacks = 1, loadFrac = 0 }: { color: string; stacks?: number; loadFrac?: number }) {
+  const running = loadFrac > 0.03;
+  const stackColor = running ? color : "#4b5563";
   return (
     <group>
       <mesh position={[0, 0.7, 0]}>
         <boxGeometry args={[2.2, 1.4, 1.6]} />
         <meshStandardMaterial color="#cbd5e0" />
       </mesh>
-      {Array.from({ length: stacks }).map((_, i) => (
-        <mesh key={i} position={[-0.6 + i * 1.2, 1.9, 0]}>
-          <cylinderGeometry args={[0.18, 0.22, 1.6, 10]} />
-          <meshStandardMaterial color={color} />
+      {/* pipework connecting the stacks */}
+      {stacks > 1 && (
+        <mesh position={[0, 1.15, 0.55]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.05, 0.05, 1.2 * (stacks - 1), 8]} />
+          <meshStandardMaterial color="#64748b" metalness={0.5} roughness={0.4} />
         </mesh>
-      ))}
+      )}
+      {/* small fuel tank beside the building */}
+      <mesh position={[1.5, 0.45, 0.6]}>
+        <cylinderGeometry args={[0.32, 0.32, 0.9, 12]} />
+        <meshStandardMaterial color="#94a3b8" metalness={0.3} roughness={0.5} />
+      </mesh>
+      {Array.from({ length: stacks }).map((_, i) => {
+        const offsetX = -0.6 + i * 1.2;
+        return (
+          <group key={i}>
+            <mesh position={[offsetX, 1.9, 0]}>
+              <cylinderGeometry args={[0.18, 0.22, 1.6, 10]} />
+              <meshStandardMaterial
+                color={stackColor}
+                emissive={running ? color : "#000000"}
+                emissiveIntensity={running ? 0.35 + loadFrac * 0.4 : 0}
+              />
+            </mesh>
+            {/* stack cap */}
+            <mesh position={[offsetX, 2.72, 0]}>
+              <cylinderGeometry args={[0.2, 0.18, 0.08, 10]} />
+              <meshStandardMaterial color="#334155" />
+            </mesh>
+            <StackExhaust loadFrac={loadFrac} offsetX={offsetX} />
+          </group>
+        );
+      })}
     </group>
   );
 }
@@ -158,11 +308,25 @@ function BatteryVisual({ color }: { color: string }) {
   return (
     <group>
       {[-0.7, 0, 0.7].map((x) => (
-        <mesh key={x} position={[x, 0.5, 0]}>
-          <boxGeometry args={[0.5, 1, 1]} />
-          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.3} />
-        </mesh>
+        <group key={x} position={[x, 0.5, 0]}>
+          <mesh>
+            <boxGeometry args={[0.5, 1, 1]} />
+            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.3} />
+          </mesh>
+          {/* cooling vents */}
+          {[-0.25, 0, 0.25].map((v) => (
+            <mesh key={v} position={[0, v, 0.51]}>
+              <boxGeometry args={[0.38, 0.06, 0.02]} />
+              <meshStandardMaterial color="#1e293b" />
+            </mesh>
+          ))}
+        </group>
       ))}
+      {/* control cabinet */}
+      <mesh position={[0, 0.35, -0.65]}>
+        <boxGeometry args={[2.2, 0.7, 0.3]} />
+        <meshStandardMaterial color="#334155" roughness={0.6} />
+      </mesh>
     </group>
   );
 }
@@ -218,8 +382,8 @@ export function GeneratorModel({ def }: { def: GeneratorDef }) {
       {def.type === "wind" && <WindVisual color={color} spinRef={spinRef} />}
       {def.type === "solar" && <SolarVisual color={color} />}
       {def.type === "hydro" && <HydroVisual color={color} />}
-      {def.type === "ccgt" && <GasVisual color={color} stacks={2} />}
-      {def.type === "peaker" && <GasVisual color={color} stacks={1} />}
+      {def.type === "ccgt" && <GasVisual color={color} stacks={2} loadFrac={loadFrac} />}
+      {def.type === "peaker" && <GasVisual color={color} stacks={1} loadFrac={loadFrac} />}
       {def.type === "battery" && <BatteryVisual color={color} />}
       {def.type === "interconnector" && (
         <InterconnectorVisual color={color} linkCount={def.countries?.length ?? 1} />

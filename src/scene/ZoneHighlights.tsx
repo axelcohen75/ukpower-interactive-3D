@@ -46,7 +46,7 @@ export function ZoneHighlights() {
   useFrame((_, delta) => {
     const active = useUiStore.getState().activeView;
     ZONES.forEach((z, i) => {
-      const target = active === z.view ? 0.7 : active === "overview" ? 0.12 : 0.025;
+      const target = active === z.view ? 0.7 : active === "overview" ? 0.4 : 0.025;
       opacities.current[i] += (target - opacities.current[i]) * Math.min(1, delta * 4);
       const mesh = refs.current[i];
       if (mesh) {

@@ -19,6 +19,12 @@ const KEY_POINTS: [hour: number, demandMW: number][] = [
   [24, 26000],
 ];
 
+/** The floor of the 24h demand curve — GB demand never dips below this,
+ *  even at 3am. This is the standard definition of "baseload": the part of
+ *  demand that's always there, as opposed to "peakload", the variable part
+ *  above it that only shows up at certain hours. */
+export const DEMAND_FLOOR_MW = Math.min(...KEY_POINTS.map(([, mw]) => mw));
+
 function cosineInterp(a: number, b: number, t: number): number {
   const mu = (1 - Math.cos(t * Math.PI)) / 2;
   return a * (1 - mu) + b * mu;
